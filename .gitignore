@@ -1,0 +1,6 @@
+# Git Ignore
+venv/
+data/generated_docs/
+*.pyc
+__pycache__/
+
