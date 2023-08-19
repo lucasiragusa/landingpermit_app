@@ -3,4 +3,4 @@ venv/
 data/generated_docs/
 *.pyc
 __pycache__/
-
+landing_env/
