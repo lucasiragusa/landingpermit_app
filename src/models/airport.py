@@ -11,3 +11,13 @@ class Airport:
         self.city = airport_data[iata_code]['municipality']
         self.country_name = airport_data[iata_code]['Country name']
         self.timezone = airport_data[iata_code]['Timezone']
+
+    def __repr__(self):
+        return str(airport_data[self.iata_code])
+    
+if __name__ == '__main__':
+    
+    import pandas as pd
+    airport_data = pd.read_pickle('../../data/industry/airport_data.pkl')
+    object = Airport('LHR', airport_data)
+    print (object)

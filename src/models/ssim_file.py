@@ -2,6 +2,7 @@ import pendulum
 import pandas as pd
 from collections import namedtuple
 import sys
+from iata_season import IATA_Season
 
 class SSIM_File: 
     '''This class initiates a SSIM file object. 
@@ -15,10 +16,12 @@ class SSIM_File:
         self.start_date = None
         self.end_date = None
         self.exported_date = None
+        self.iata_seasons = None
         self.df = None
         
         self._get_ssim_attributes()
         self._get_col_data()
+        self.get_iata_seasons()
 
         self._get_ssim_df(ssim_file, *self._get_col_data())
                
@@ -53,8 +56,8 @@ class SSIM_File:
 
 
     # Named tuple for column length
-
-    def _get_col_data(self):
+    @staticmethod
+    def _get_col_data():
 
         '''
         Defines the cosnstants necessary to extract data from the fixed width file
@@ -84,6 +87,7 @@ class SSIM_File:
         'Traffic restriction code leg overflow indicator',
         'Aircraft configuration','Date variation',
         'Record serial number']
+
         cols_to_keep = [
         'Airline designator',
         'Flight number',
@@ -137,6 +141,43 @@ class SSIM_File:
 
         self.df = df
 
+    def get_iata_seasons(self):
+        seasons = []
+
+        # Helper function to determine the season of a given date
+        def determine_season(date):
+            summer_start = pendulum.datetime(date.year, 3, 31, 0, 0, 0).last_of('month', day_of_week=pendulum.SUNDAY)
+            winter_start = pendulum.datetime(date.year, 10, 31, 0, 0, 0).last_of('month', day_of_week=pendulum.SUNDAY)
+            
+            if summer_start <= date < winter_start:
+                return 'S' + str(date.year)[2:]
+            else:
+                if date < summer_start:
+                    return 'W' + str(date.year - 1)[2:]
+                else:
+                    return 'W' + str(date.year)[2:]
+
+        # Identify the season of the start and end dates
+        start_season = determine_season(self.start_date)
+        end_season = determine_season(self.end_date)
+
+        # Now fill in the seasons in between
+        current_season = start_season
+        while current_season != end_season:
+            seasons.append(current_season)
+
+            # Move to the next season
+            if 'S' in current_season:
+                current_season = 'W' + current_season[1:]
+            else:
+                year = int(current_season[1:]) + 1
+                current_season = 'S' + str(year).zfill(2)
+        
+        # Add the end season and return
+        seasons.append(end_season)
+
+        self.iata_seasons = [IATA_Season(season) for season in seasons]
+
 
 # Test code
 if __name__ == '__main__':
@@ -150,10 +191,10 @@ if __name__ == '__main__':
 
     ssim_object = SSIM_File(ssim)
 
-    for attribute, value in ssim_object.__dict__.items():
-        print(f"{attribute}: {value}")
+    # for attribute, value in ssim_object.__dict__.items():
+    #     print(f"{attribute}: {value}")
 
-    print(ssim_object.df.head())
+    print(ssim_object.iata_seasons)
 
     elapsed_time = time.time() - start_time  # Calculate elapsed time
 
