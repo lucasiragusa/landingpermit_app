@@ -40,13 +40,32 @@ class SSIMFileReader:
         }
 
     def get_dataframe(self, filename, col_length, col_headers, cols_to_keep):
+
+        """Parses a fixed-width file (SSIM) and returns a filtered dataframe based on given specifications.
+    
+        This function will filter out rows specific to flights (where Record type is 3) and also 
+        apply specific transformations to columns 'Arvl time (pax)' and 'Flight number'.
+        It then stores the resultant dataframe as an attribute for the instance.
+        
+        Parameters:
+        - filename (str): The path to the SSIM file to be read.
+        - col_length (list of tuple): A list specifying the start and end position of each column.
+        - col_headers (list of str): A list containing names for each column.
+        - cols_to_keep (list of str): Columns that are to be retained in the final dataframe.
+        
+        Returns:
+        None. But it updates the instance's `df` attribute with the processed dataframe. """
+
         df = pd.read_fwf(filename, colspecs=col_length, header=None, names=col_headers)
         # Filter rows for flights
         df = df[df['Record type'] == 3]
         df = df[cols_to_keep]
         df['Arvl time (pax)'] = df['Arvl time (pax)'].apply(lambda x: str(int(x)).zfill(4))
         df['Flight number'] = df.apply(lambda x: x['Airline designator'] + '  ' + str(x['Flight number']).zfill(4), axis=1)
-        df.drop(columns=['Airline designator'], inplace=True)
+        # df.drop(columns=['Airline designator'], inplace=True)
         df.reset_index(drop=True, inplace=True)
 
-        self.df = df
+        return df
+
+    def export_df (self, filename):
+        self.df.to_csv(filename, index=False)

@@ -1,6 +1,10 @@
 
 # Right now this main to be used as testbed
 from models.ssim_file import SSIM_File
+from models.airport import Airport
+from models.flight_series_handler import FlightSeriesHandler
+from lib.permit_generator import generate_document
+
 import sys
 import os
 import pandas as pd
@@ -10,16 +14,23 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 
 
-
 def main(): 
-    
-    ssim = sys.argv[1]
+    import numpy as np 
 
+    ssim = sys.argv[1]
     ssim_object = SSIM_File(ssim)
 
-    for season in ssim_object.iata_seasons: 
-        print (season.name)
+    handler = FlightSeriesHandler()
+    handler.create_flight_series_from_df(ssim_object.df)
+
+    # If you want to print all unique countries present in the flight series
+    unique_countries = handler.get_unique_countries()
+
+    # Filter by a specific country and print results.
+    for country_code in unique_countries:
+        print (f'Creating permit for: {country_code}')
+        
+        generate_document(country_code, ssim_object, 'FlySample', 'Luca Siragusa', handler)
 
 if __name__ == '__main__':
     main()
-

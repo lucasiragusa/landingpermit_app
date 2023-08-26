@@ -4,6 +4,7 @@ from collections import namedtuple
 import sys
 from models.ssim_file_reader import SSIMFileReader
 from models.seasons_handler import DateSeasonHandler
+from models.flight_series_handler import FlightSeriesHandler
 
 class SSIM_File: 
     '''This class initiates a SSIM file object. 
@@ -23,7 +24,10 @@ class SSIM_File:
         self.df = self.reader.get_dataframe(ssim_file_path, *self._get_col_data())
         self.season_handler = DateSeasonHandler(self.start_date, self.end_date)
         self.iata_seasons = self.season_handler.get_iata_seasons()
-               
+        self.flight_series_handler = FlightSeriesHandler()
+        self.flight_series_list = self.flight_series_handler.create_flight_series_from_df(self.df)
+
+
     # Named tuple for column length
     @staticmethod
     def _get_col_data():
@@ -96,6 +100,9 @@ class SSIM_File:
         col_length = [Position(*data) for data in col_length_data]
 
         return col_length, col_headers, cols_to_keep
+    
+    def export_to_csv(self, filename):
+        self.df.to_csv(filename, index=False)
 
 
 # # Test code

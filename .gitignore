@@ -4,3 +4,5 @@ data/generated_docs/
 *.pyc
 __pycache__/
 landing_env/
+src/permits_output
+src/tree.py
