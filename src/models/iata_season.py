@@ -25,23 +25,21 @@ class IATA_Season:
 
 
 # Test code
-if __name__ == '__main__':
-    import sys
-    import time
+# if __name__ == '__main__':
+#     import sys
+#     import time
     
+#     ssim = sys.argv[1]
 
+#     start_time = time.time()  # Start the timer
 
-    ssim = sys.argv[1]
+#     ssim_object = SSIM_File(ssim)
 
-    start_time = time.time()  # Start the timer
+#     print(ssim_object.start_date)
+#     print(ssim_object.end_date)
 
-    ssim_object = SSIM_File(ssim)
+#     # print(ssim_object.df.head())
 
-    print(ssim_object.start_date)
-    print(ssim_object.end_date)
+#     elapsed_time = time.time() - start_time  # Calculate elapsed time
 
-    # print(ssim_object.df.head())
-
-    elapsed_time = time.time() - start_time  # Calculate elapsed time
-
-    print(f"\nTime taken to execute read_ssim: {elapsed_time:.2f} seconds")
+#     print(f"\nTime taken to execute read_ssim: {elapsed_time:.2f} seconds")

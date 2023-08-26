@@ -2,7 +2,8 @@ import pendulum
 import pandas as pd
 from collections import namedtuple
 import sys
-from iata_season import IATA_Season
+from models.ssim_file_reader import SSIMFileReader
+from models.seasons_handler import DateSeasonHandler
 
 class SSIM_File: 
     '''This class initiates a SSIM file object. 
@@ -10,51 +11,19 @@ class SSIM_File:
     create attributes for the object (UTC, local, start/end date etc.)
     '''
 
-    def __init__(self, ssim_file):
-        self.ssim_file = ssim_file
-        self.timezone_mode = None
-        self.start_date = None
-        self.end_date = None
-        self.exported_date = None
-        self.iata_seasons = None
-        self.df = None
-        
-        self._get_ssim_attributes()
-        self._get_col_data()
-        self.get_iata_seasons()
-
-        self._get_ssim_df(ssim_file, *self._get_col_data())
+    def __init__(self, ssim_file_path):
+        self.reader = SSIMFileReader(ssim_file_path)
+        self.attributes = self.reader.get_attributes()
+        print(self.attributes)
+        attributes = self.reader.get_attributes()
+        self.timezone_mode = attributes['timezone_mode']
+        self.start_date = attributes['start_date']
+        self.end_date = attributes['end_date']
+        self.exported_date = attributes['exported_date']
+        self.df = self.reader.get_dataframe(ssim_file_path, *self._get_col_data())
+        self.season_handler = DateSeasonHandler(self.start_date, self.end_date)
+        self.iata_seasons = self.season_handler.get_iata_seasons()
                
-
-    def _get_ssim_attributes(self): 
-        '''
-        This function takes an SSIM file and returns a dictionary with the main attributes of the file.
-        For example, it tells if the file is in local or UTC mode, the start and end date of the file in local and utc, etc
-        The idea of this function is that it will be used to create a SSIMFile object 
-        '''
-        
-        with open(self.ssim_file, 'r') as file:
-            for line in file:
-                if line.startswith('2'):
-                    self.timezone_mode = 'local' if line[1] == 'L' else 'UTC' if line[1] == 'U' else None
-                    
-                    start_date_str = line[14:21].title()  # Convert to format with first letter capital
-                    self.start_date = pendulum.from_format(start_date_str, "DDMMMYY")
-
-                    end_date_str = line[21:28].title()  # Convert to format with first letter capital
-                    self.end_date = pendulum.from_format(end_date_str, "DDMMMYY")
-
-                    try:
-                        exported_date_str = line[28:35].title()  # Convert to format with first letter capital
-                        self.exported_date = pendulum.from_format(exported_date_str, "DDMMMYY")
-                    except:
-                        self.exported_date = None
-                    
-                    # Once we find and process the line starting with '2', we can break out of the loop
-                    break
-
-
-
     # Named tuple for column length
     @staticmethod
     def _get_col_data():
@@ -127,75 +96,25 @@ class SSIM_File:
         col_length = [Position(*data) for data in col_length_data]
 
         return col_length, col_headers, cols_to_keep
-    
-    
-    def _get_ssim_df(self, filename, col_length, col_headers, cols_to_keep):
-        df = pd.read_fwf(filename, colspecs=col_length, header=None, names=col_headers)
-        # Filter rows for flights
-        df = df[df['Record type'] == 3]
-        df = df[cols_to_keep]
-        df['Arvl time (pax)'] = df['Arvl time (pax)'].apply(lambda x: str(int(x)).zfill(4))
-        df['Flight number'] = df.apply(lambda x: x['Airline designator'] + '  ' + str(x['Flight number']).zfill(4), axis=1)
-        df.drop(columns=['Airline designator'], inplace=True)
-        df.reset_index(drop=True, inplace=True)
-
-        self.df = df
-
-    def get_iata_seasons(self):
-        seasons = []
-
-        # Helper function to determine the season of a given date
-        def determine_season(date):
-            summer_start = pendulum.datetime(date.year, 3, 31, 0, 0, 0).last_of('month', day_of_week=pendulum.SUNDAY)
-            winter_start = pendulum.datetime(date.year, 10, 31, 0, 0, 0).last_of('month', day_of_week=pendulum.SUNDAY)
-            
-            if summer_start <= date < winter_start:
-                return 'S' + str(date.year)[2:]
-            else:
-                if date < summer_start:
-                    return 'W' + str(date.year - 1)[2:]
-                else:
-                    return 'W' + str(date.year)[2:]
-
-        # Identify the season of the start and end dates
-        start_season = determine_season(self.start_date)
-        end_season = determine_season(self.end_date)
-
-        # Now fill in the seasons in between
-        current_season = start_season
-        while current_season != end_season:
-            seasons.append(current_season)
-
-            # Move to the next season
-            if 'S' in current_season:
-                current_season = 'W' + current_season[1:]
-            else:
-                year = int(current_season[1:]) + 1
-                current_season = 'S' + str(year).zfill(2)
-        
-        # Add the end season and return
-        seasons.append(end_season)
-
-        self.iata_seasons = [IATA_Season(season) for season in seasons]
 
 
-# Test code
-if __name__ == '__main__':
-    import sys
-    import time
-    import pendulum
+# # Test code
+# if __name__ == '__main__':
+#     import sys
+#     import time
+#     import pendulum
 
-    ssim = sys.argv[1]
+#     ssim = sys.argv[1]
 
-    start_time = time.time()  # Start the timer
+#     start_time = time.time()  # Start the timer
 
-    ssim_object = SSIM_File(ssim)
+#     ssim_object = SSIM_File(ssim)
 
-    # for attribute, value in ssim_object.__dict__.items():
-    #     print(f"{attribute}: {value}")
+#     # for attribute, value in ssim_object.__dict__.items():
+#     #     print(f"{attribute}: {value}")
 
-    print(ssim_object.iata_seasons)
+#     print(ssim_object.iata_seasons)
 
-    elapsed_time = time.time() - start_time  # Calculate elapsed time
+#     elapsed_time = time.time() - start_time  # Calculate elapsed time
 
-    print(f"\nTime taken to execute read_ssim: {elapsed_time:.2f} seconds")
+#     print(f"\nTime taken to execute read_ssim: {elapsed_time:.2f} seconds")
