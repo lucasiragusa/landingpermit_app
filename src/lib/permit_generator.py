@@ -1,7 +1,8 @@
 import sys
-import os 
+import os
 import pandas as pd
 
+# TODO: install lib as package instead
 # This will get the path to the parent directory of the current directory (i.e., landingpermit_app)
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -12,8 +13,8 @@ from docx import Document
 from docx.shared import Inches
 
 
-def generate_document(country, ssim_file, airline_name, contact_person, handler):
-    
+def generate_document(country, ssim_file, airline_name, contact_person, handler): # TODO: add type hints?
+    # TODO: add docstring
     start_date = ssim_file.start_date
     end_date = ssim_file.end_date
 
