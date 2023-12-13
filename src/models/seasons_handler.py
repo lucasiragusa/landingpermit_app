@@ -10,6 +10,7 @@ class DateSeasonHandler:
 
     # Helper function to determine the season of a given date
 
+    # TODO: isn't there already a built-in function for this? 
     def determine_season(self, date):
         summer_start = pendulum.datetime(date.year, 3, 31, 0, 0, 0).last_of('month', day_of_week=pendulum.SUNDAY)
         winter_start = pendulum.datetime(date.year, 10, 31, 0, 0, 0).last_of('month', day_of_week=pendulum.SUNDAY)
