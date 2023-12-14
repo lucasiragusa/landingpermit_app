@@ -1,6 +1,6 @@
 from models.flight_series import FlightSeries
 from models.airport import Airport
-from models.airport_data_loader import airport_data
+from models.airport import airport_data
 
 class FlightSeriesHandler:
     def __init__(self):

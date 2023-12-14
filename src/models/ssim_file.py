@@ -104,24 +104,3 @@ class SSIM_File:
     def export_to_csv(self, filename):
         self.df.to_csv(filename, index=False)
 
-
-# # Test code
-# if __name__ == '__main__':
-#     import sys
-#     import time
-#     import pendulum
-
-#     ssim = sys.argv[1]
-
-#     start_time = time.time()  # Start the timer
-
-#     ssim_object = SSIM_File(ssim)
-
-#     # for attribute, value in ssim_object.__dict__.items():
-#     #     print(f"{attribute}: {value}")
-
-#     print(ssim_object.iata_seasons)
-
-#     elapsed_time = time.time() - start_time  # Calculate elapsed time
-
-#     print(f"\nTime taken to execute read_ssim: {elapsed_time:.2f} seconds")
