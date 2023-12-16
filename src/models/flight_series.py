@@ -3,6 +3,35 @@ from models.airport import Airport
 
 class FlightSeries: 
 
+    """
+    Represents a series of flights, all of which share the same details. 
+    It is a customary representation of scheduled flights in the airline industry. 
+    Many instances of "Flight" objectes can be grouped as a flight series object so far 
+    as they share the same attributes other than departure date. 
+
+    Attributes:
+        airline_designator (str): The IATA Designator of the Operating Airline.
+        flight_number (str): The flight number. 
+        service_type (str): SSIM-compliant Service type indicating the type of flight (e.g. scheduled pax, cargo, etc.)
+        effective_date (str): The starting date from which the flight series is effective.
+        discontinued_date (str): The date after which the flight series is no longer operational.
+        days_of_operation (str): Days of the week on which the flight operates.(Monday = 1)
+        departure_station (Airport): The airport from which the flight departs.
+        departure_time (str): The scheduled departure time of the flight.
+        arrival_station (Airport): The airport at which the flight arrives.
+        arrival_time (str): The scheduled arrival time of the flight.
+        equipment (str): Details about the flight's equipment.
+        aircraft_configuration (str): Configuration of the aircraft used in the flight.
+
+    Methods:
+        __init__(flight_series_data): Constructs the FlightSeries object with provided flight series data.
+        __repr__(): Returns a string representation of the FlightSeries object.
+        to_dict(): Converts the FlightSeries object to a dictionary representation.
+
+    The FlightSeries is initialized with a dictionary containing the flight series data.
+    Each attribute of the class represents a key aspect of the flight series information.
+    """
+
     def __init__(self, flight_series_data):
         
         self.airline_designator = flight_series_data['Airline designator']
@@ -17,7 +46,9 @@ class FlightSeries:
         self.arrival_time = flight_series_data['Arvl time (pax)']
         self.equipment = flight_series_data['Equipment']
         self.aircraft_configuration = flight_series_data['Aircraft configuration']
-        #Add number of Flights
+        #Add count of Flights in flight series
+        #Add time mode (local/UTC) in arguments to constructor
+        #Add IATA Season
 
     def __repr__(self):
         return f"{self.airline_designator} {self.flight_number}: {self.departure_station}-{self.arrival_station} ({self.effective_date}-{self.discontinued_date})"

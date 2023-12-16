@@ -4,6 +4,7 @@ from models.ssim_file import SSIM_File
 from models.airport import Airport
 from models.flight_series_handler import FlightSeriesHandler
 from lib.permit_generator import generate_document
+import time #debug
 
 import sys
 import os
@@ -31,7 +32,12 @@ def main():
     for country_code in unique_countries:
         print (f'Creating permit for: {country_code}')
         
+        start_time = time.time()  # Start timing
         generate_document(country_code, ssim_object, 'FlySample', 'Luca Siragusa', handler)
+        end_time = time.time()  # End timing
+
+        duration = end_time - start_time
+        print(f'Time taken for {country_code}: {duration:.2f} seconds\n')
 
 if __name__ == '__main__':
     main()
