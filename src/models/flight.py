@@ -1,10 +1,9 @@
-<<<<<<< Updated upstream
 # TODO: What shall this be about?
 # A flight series is a series of flights that have the same exact characteristics 
 # (same origin, destination, flight number, departure time, arrival time, season etc.)
 # But fundamentally it is made up by individual flights, this class is supposed to represent individual flights 
 # It will be useful in the part where we compare the base ssim with the alt ssim and output only the flights that changed
-=======
+
 from models.airport import airport_data
 from models.airport import Airport
 
@@ -41,4 +40,4 @@ class Flight:
     def __repr__(self):
         return (f"{self.airline_designator} {self.flight_number}: {self.departure_station}-{self.arrival_station} "
                 f"on {self.departure_date} at {self.departure_time}")
->>>>>>> Stashed changes
+

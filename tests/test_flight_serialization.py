@@ -1,6 +1,6 @@
 import random
 import datetime
-from models.flight import Flight  # Assuming you have a Flight class defined in models/flight.py
+from models.flight import Flight
 
 def create_flights(flight_data, start_date, end_date, probability):
     """
@@ -29,19 +29,21 @@ def create_flights(flight_data, start_date, end_date, probability):
 flight_base_data = {
     'Airline designator': 'XY',
     'Flight number': '123',
-    'Service Type': 'Scheduled Pax',
-    'Dept Stn': {'iata_code': 'JFK', 'name': 'John F Kennedy International Airport'},
+    'Service Type': 'J',
+    'Dept Stn': 'JFK',
     'Dept time (pax)': '08:00',
-    'Arvl Stn': {'iata_code': 'LAX', 'name': 'Los Angeles International Airport'},
+    'Arvl Stn': 'LAX',
     'Arvl time (pax)': '11:00',
-    'Equipment': 'Boeing 737',
-    'Aircraft configuration': 'Economy/Business'
+    'Equipment': '321',
+    'Aircraft configuration': 'Y180'
 }
 
-start_date = datetime.date(2023, 1, 1)
-end_date = datetime.date(2023, 1, 10)
-probability = 0.5  # 50% chance of a flight occurring on any given day
+if __name__ == '__main__':
 
-flights = create_flights(flight_base_data, start_date, end_date, probability)
-for flight in flights:
-    print(flight)
+    start_date = datetime.date(2022, 12, 1)
+    end_date = datetime.date(2023, 5, 10)
+    probability = 0.95  # 50% chance of a flight occurring on any given day
+
+    flights = create_flights(flight_base_data, start_date, end_date, probability)
+    for flight in flights:
+        print(flight)

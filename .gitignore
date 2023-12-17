@@ -8,3 +8,4 @@ src/permits_output
 src/tree.py
 data/.DS_Store
 src/.DS_Store
+.vscode/
