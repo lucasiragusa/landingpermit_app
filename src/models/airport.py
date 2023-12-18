@@ -17,4 +17,4 @@ class Airport:
     def __repr__(self):
         return str(airport_data[self.iata_code])
     
-airport_data = pd.read_pickle('../data/industry/airport_data.pkl')
+airport_data = pd.read_pickle('./data/industry/airport_data.pkl')

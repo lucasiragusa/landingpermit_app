@@ -69,4 +69,3 @@ elif app_mode == "Comparative Doc Generation":
     with col2:
         st.subheader("Insert new SSIM File")
         new_ssim_file = st.file_uploader("Drag and drop file here or click to browse", type="txt", key="new_ssim")
-

@@ -4,8 +4,9 @@
 # But fundamentally it is made up by individual flights, this class is supposed to represent individual flights 
 # It will be useful in the part where we compare the base ssim with the alt ssim and output only the flights that changed
 
-from models.airport import airport_data
-from models.airport import Airport
+from models.airport import airport_data, Airport
+import pendulum
+
 
 class Flight:
     """
@@ -36,8 +37,14 @@ class Flight:
         self.arrival_time = flight_data['Arvl time (pax)']
         self.equipment = flight_data['Equipment']
         self.aircraft_configuration = flight_data['Aircraft configuration']
+        self.isocalendar = pendulum.from_format(self.departure_date, 'DDMMMYY').isocalendar()
+        self.year = self.isocalendar[0]
+        self.isoweek = self.isocalendar[1]
+        self.weekday = self.isocalendar[2]
+        self.week_signature = str(self.year) + '_' + str(self.isoweek)
 
-    def __repr__(self):
-        return (f"{self.airline_designator} {self.flight_number}: {self.departure_station}-{self.arrival_station} "
-                f"on {self.departure_date} at {self.departure_time}")
+    def _repr__(self):
+        return f'{self.flight_number} {self.departure_date} {self.departure_time} {self.arrival_time} ({self.week_signature})'
 
+    def __str__(self) -> str:
+        return f'{self.flight_number} {self.departure_date} {self.departure_time} {self.arrival_time} ({self.week_signature})'
