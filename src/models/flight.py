@@ -44,7 +44,7 @@ class Flight:
         self.week_signature = str(self.year) + '_' + str(self.isoweek)
 
     def _repr__(self):
-        return f'{self.flight_number} {self.departure_date} {self.departure_time} {self.arrival_time} ({self.week_signature})'
+        return f'{self.flight_number} {self.departure_date} {self.departure_time} {self.arrival_time} ({self.week_signature}) Weekday: {self.weekday}'
 
     def __str__(self) -> str:
-        return f'{self.flight_number} {self.departure_date} {self.departure_time} {self.arrival_time} ({self.week_signature})'
+        return f'{self.flight_number} {self.departure_date} {self.departure_time} {self.arrival_time} ({self.week_signature}) Weekday: {self.weekday}'

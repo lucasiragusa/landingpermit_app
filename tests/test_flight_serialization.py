@@ -1,5 +1,6 @@
 import sys
 from pathlib import Path
+import time  
 
 # Calculate the path to the 'src' directory
 root_dir = Path(__file__).resolve().parent.parent
@@ -134,10 +135,22 @@ def write_transformed_flights_to_file(transformed_flights, filename, header, mod
         for key, value in transformed_flights.items():
             file.write(f'{key}: {value}\n')
 
-
+def format_dow_string (dow_string): 
+    
+    result = ''
+    
+    for i in range (1,8): 
+        if str(i) in dow_string: 
+            result += str(i)
+        else: 
+            result += '.'
+    
+    return result
 
 if __name__ == '__main__':
 
+    start_time = time.time() 
+    
     # Declare flights to be tested
     flight_base_data = {
     'Airline designator': 'XY',
@@ -154,7 +167,7 @@ if __name__ == '__main__':
     # Build parameters for create_flights function
     start_date = '01Nov22'
     end_date = '02May23'
-    probability = .8  # chance of a flight occurring on any given day
+    probability = 1  # chance of a flight occurring on any given day
     flights = create_flights(flight_base_data, start_date, end_date, probability)
     print (f'{len(flights)} flights created')
 
@@ -162,8 +175,8 @@ if __name__ == '__main__':
     write_flights_to_file(flights, 'flights_all_stages.txt', '--- Stage 1: Flights Created ---', mode='w')  # 'w' to write from the beginning
 
     # Take lowest and highest departure date from list of flights 
-    min_dep_date = min(flights, key=lambda x: x.departure_date).departure_date
-    max_dep_date = max(flights, key=lambda x: x.departure_date).departure_date
+    min_dep_date = min(flights, key=lambda x: parse_date(x.departure_date)).departure_date
+    max_dep_date = max(flights, key=lambda x: parse_date(x.departure_date)).departure_date
 
     # Define format string for desired format
     date_format = "%d%b%y"
@@ -188,14 +201,23 @@ if __name__ == '__main__':
     flights_by_week_new = {}
 
     for week, flight_list in flights_by_week.items():
+        
         flights_by_week_new[week] = ''
         
         for weekday in range(1, 8):
             # Check if there's a flight on this weekday or if the flight's departure date is outside the specified range
-            if any(flight.weekday == weekday or parse_date(flight.departure_date) < parse_date(min_dep_date) or parse_date(flight.departure_date) > parse_date(max_dep_date) for flight in flight_list):
-                flights_by_week_new[week] += str(weekday)
-            else:
-                flights_by_week_new[week] += '.'
+            # TODO: add that it should return a number also if the flight's departure date is outside the specified range
+            
+            for flight in flight_list:
+                print (f'Departure date: {flight.departure_date} Type: {type(flight.departure_date)} Parsed: {parse_date(flight.departure_date)}')
+                print(f'min_dep_date: {start_date} Type : {type(min_dep_date)}')
+                print(f'max_dep_date: {end_date} Type: {type(max_dep_date)}')
+                if (flight.weekday == weekday) or (parse_date(flight.departure_date) < start_date) or (parse_date(flight.departure_date) > end_date):
+                    flights_by_week_new[week] += str(weekday)
+
+    # Format all dow strings to have a dot notation
+    for week, dow_string in flights_by_week_new.items():
+        flights_by_week_new[week] = format_dow_string(dow_string)
     
     flights_by_week = {(key, key): value for key, value in flights_by_week_new.items()}
     
@@ -203,7 +225,14 @@ if __name__ == '__main__':
     
     transformed_flights = transform_week_signatures(merge_dict_pairs(flights_by_week))
 
-    # Assuming transformed_flights is a list or similar iterable
-    write_transformed_flights_to_file(transformed_flights, 'flights_all_stages.txt', '--- Stage 3: Transformed Flights ---')
+    end_time = time.time()
+    elapsed_time = end_time - start_time
     
+    # Assuming transformed_flights is a list or similar iterable
+    write_transformed_flights_to_file(transformed_flights, 'flights_all_stages.txt', f'--- Stage 3: Flight Series Minimal Representation --- Elapsed time: {elapsed_time} seconds')
+
+    #TODO: Add an additional piece of logic to ensure that we are showing the minimum representation: 
+        # Count the contiguous number of days with consecutive flights. 
+        # If the number of intervals resulting from using the with consecutive flights representation is less than the number of intervals represented
+        # with the dot notation, then we should use the consecutive flights representation.
 
