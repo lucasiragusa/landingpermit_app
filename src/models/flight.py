@@ -24,9 +24,18 @@ class Flight:
         arrival_time (str): The scheduled arrival time of the flight.
         equipment (str): Details about the flight's equipment.
         aircraft_configuration (str): Configuration of the aircraft used in the flight.
+        isocalendar (tuple): A tuple containing the year, week number and weekday of the flight's departure date.
+        year (int): The year of the flight's departure date.
+        isoweek (int): The week number of the flight's departure date.
+        weekday (int): The weekday of the flight's departure date.
+        week_signature (str): A string containing the year and week number of the flight's departure date.
+        unique_id (str): A unique identifier for the flight.
+        change_status (str): Indicates if the flight has been added, deleted or modified.
     """
 
     def __init__(self, flight_data):
+        
+        # Arguments that must be in flight_data:
         self.airline_designator = flight_data['Airline designator']
         self.flight_number = flight_data['Flight number']
         self.service_type = flight_data['Service Type']
@@ -37,14 +46,39 @@ class Flight:
         self.arrival_time = flight_data['Arvl time (pax)']
         self.equipment = flight_data['Equipment']
         self.aircraft_configuration = flight_data['Aircraft configuration']
+        
+        # Arguments that can be calculated from the above:
         self.isocalendar = pendulum.from_format(self.departure_date, 'DDMMMYY').isocalendar()
         self.year = self.isocalendar[0]
         self.isoweek = self.isocalendar[1]
         self.weekday = self.isocalendar[2]
         self.week_signature = str(self.year) + '_' + str(self.isoweek)
+        self.unique_id = self.flight_number + '_' + self.departure_date
+        self.change_status = None
 
     def _repr__(self):
         return f'{self.flight_number} {self.departure_date} {self.departure_time} {self.arrival_time} ({self.week_signature}) Weekday: {self.weekday}'
 
     def __str__(self) -> str:
         return f'{self.flight_number} {self.departure_date} {self.departure_time} {self.arrival_time} ({self.week_signature}) Weekday: {self.weekday}'
+    
+    def __eq__(self, other):
+        if not isinstance(other, Flight):
+            return False
+
+        return (self.airline_designator == other.airline_designator and
+                self.flight_number == other.flight_number and
+                self.service_type == other.service_type and
+                self.departure_date == other.departure_date and
+                self.departure_station == other.departure_station and
+                self.departure_time == other.departure_time and
+                self.arrival_station == other.arrival_station and
+                self.arrival_time == other.arrival_time and
+                self.equipment == other.equipment and
+                self.aircraft_configuration == other.aircraft_configuration)
+
+    def __hash__(self):
+        return hash((self.airline_designator, self.flight_number, self.service_type,
+                     self.departure_date, self.departure_station, self.departure_time,
+                     self.arrival_station, self.arrival_time, self.equipment,
+                     self.aircraft_configuration))

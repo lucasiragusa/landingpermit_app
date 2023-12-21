@@ -308,8 +308,8 @@ if __name__ == '__main__':
     }
     
     # Build parameters for create_flights function
-    start_date = '01Nov22'
-    end_date = '02May23'
+    start_date = '31Oct22'
+    end_date = '13Nov22'
     probability = 1  # chance of a flight occurring on any given day
     flights = create_flights(flight_base_data, start_date, end_date, probability)
     print (f'{len(flights)} flights created')
