@@ -85,13 +85,6 @@ if __name__ == '__main__':
     base_object = SSIM_File(base_ssim_path)
     alt_object = SSIM_File(alt_ssim_path)
     
-    # Write to excel both base and alt objects.df in two separate sheets
-    with pd.ExcelWriter(base_dir / 'compare_testing.xlsx') as writer:
-        base_object.df.to_excel(writer, sheet_name='base')
-        alt_object.df.to_excel(writer, sheet_name='alt')
-    
-    
-    
     base_set = de_serialize(base_ssim_path)
     alt_set = de_serialize(alt_ssim_path)
     
