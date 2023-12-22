@@ -11,6 +11,10 @@ class DateSeasonHandler:
     # Helper function to determine the season of a given date
 
     # TODO: isn't there already a built-in function for this? 
+    # Not to my knowledge, this concept of Season is specific to IATA, Summer season starts on the last Sunday of March and ends on the last Sunday of October
+    # If there is a built-in function for this, it would be great to use it instead
+    # I also thought a good byproduct of this work would be to open-source certain functions like this for other aviation people to use
+    
     def determine_season(self, date):
         summer_start = pendulum.datetime(date.year, 3, 31, 0, 0, 0).last_of('month', day_of_week=pendulum.SUNDAY)
         winter_start = pendulum.datetime(date.year, 10, 31, 0, 0, 0).last_of('month', day_of_week=pendulum.SUNDAY)

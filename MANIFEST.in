@@ -1,0 +1,2 @@
+include data/industry/airport_data.pkl
+recursive-include data/ssim *.ssim

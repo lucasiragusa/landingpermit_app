@@ -11,8 +11,8 @@ import pandas as pd
 import pendulum
 
 # TODO: install as package instead
-sys.path.append(os.path.dirname(os.path.abspath(__file__))) # TODO: use pathlib instead of os.path
-
+from pathlib import Path
+sys.path.append(str(Path(__file__).parent.resolve()))
 
 
 def main(): 

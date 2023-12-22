@@ -1,12 +1,13 @@
 import sys
 import os
 import pandas as pd
+from pathlib import Path
 
 # TODO: install lib as package instead
 # This will get the path to the parent directory of the current directory (i.e., landingpermit_app)
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from src.models import flight_series_handler, airport_data_loader, airport, flight_series, ssim_file
+from models import flight_series_handler, airport, flight_series, ssim_file
 
 
 from docx import Document
@@ -15,6 +16,26 @@ from docx.shared import Inches
 
 def generate_document(country, ssim_file, airline_name, contact_person, handler): # TODO: add type hints?
     # TODO: add docstring
+    
+    """
+    Generates a landing permit document in .docx format for a specific country.
+
+    This function creates a Word document requesting a landing permit. It includes 
+    details about the flights operated by an airline to the specified country within a certain date range. 
+    The document contains a heading, an introductory paragraph, a table of flight series, 
+    and a closing signature.
+
+    Args:
+        country (str): The country for which the landing permit is requested.
+        ssim_file (SSIM_File): An object representing the SSIM file containing flight data.
+        airline_name (str): The name of the airline requesting the permit.
+        contact_person (str): The name of the contact person for the airline.
+        handler (FlightSeriesHandler): A handler object to process flight series data.
+
+    Returns:
+        None: The function creates and saves a .docx file but does not return any value.
+    """
+    
     start_date = ssim_file.start_date
     end_date = ssim_file.end_date
 

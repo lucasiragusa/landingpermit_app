@@ -1,4 +1,4 @@
-from models.airport_data_loader import airport_data
+from models.airport import airport_data
 from models.airport import Airport
 
 class FlightSeries: 
