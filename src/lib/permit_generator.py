@@ -7,11 +7,8 @@ from pathlib import Path
 # This will get the path to the parent directory of the current directory (i.e., landingpermit_app)
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-<<<<<<< Updated upstream
 from models import flight_series_handler, airport, flight_series, ssim_file
-=======
 from models import flight_series_handler, airport_data_loader, airport, flight_series, ssim_file
->>>>>>> Stashed changes
 
 
 from docx import Document

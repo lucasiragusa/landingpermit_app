@@ -18,7 +18,6 @@ class SSIM_File:
         
         self.reader = SSIMFileReader(ssim_file_path)
         self.attributes = self.reader.get_attributes()
-        # print(self.attributes)
         attributes = self.reader.get_attributes()
         self.timezone_mode = attributes['timezone_mode']
         self.start_date = attributes['start_date']

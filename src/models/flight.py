@@ -56,11 +56,11 @@ class Flight:
         self.unique_id = self.flight_number + '_' + self.departure_date
         self.change_status = None
 
-    def _repr__(self):
+    def __repr__(self):
         return f'{self.flight_number} {self.departure_date} {self.departure_time} {self.arrival_time} ({self.week_signature}) Weekday: {self.weekday}'
 
     def __str__(self) -> str:
-        return f'{self.flight_number} {self.departure_date} {self.departure_time} {self.arrival_time} ({self.week_signature}) Weekday: {self.weekday}'
+        return f'{self.flight_number} {self.departure_date} {self.departure_station}-{self.arrival_station} {self.departure_time} {self.arrival_time} ({self.week_signature}) Weekday: {self.weekday}'
     
     def __eq__(self, other):
         if not isinstance(other, Flight):

@@ -24,7 +24,6 @@ def de_serialize(ssim_path):
 
         # For each flight series object, create however many flight object are necessary
         for series in flight_series:
-            # print (f'Checking for flight series: {series}')
             
             # Get the dates in between the effective and discountinue date
             n_days = get_date_range(reformat_date_signature(series.effective_date), reformat_date_signature(series.discontinued_date))
@@ -35,13 +34,8 @@ def de_serialize(ssim_path):
             for day in range(n_days):
                 # If the day of operation is a number, create a flight object
                 date = effective_date.add(days=day) # -1 because the first day is the effective date
-                
-                # print(f'Checking for date {date}')
-                # print(f'Weekday is {get_weekday(date)}')
-                # print(f'Days of operation are {series.days_of_operation}')
-                
+                                
                 if str(get_weekday(date)) in series.days_of_operation:
-                    # print ('Positive Match, creating flight object...')
                     
                     # Create a flight object
                     flight_dict = {}

@@ -15,53 +15,51 @@ from models.de_serialize import de_serialize
 
 
 def compare_flights(base_flights, alt_flights):
-    """
-    Compare two sets of flights and categorize them based on changes.
-
-    Parameters:
-    - base_flights (set): A set of Flight objects representing the base flights.
-    - alt_flights (set): A set of Flight objects representing the alternative flights.
-
-    Returns:
-    - dict: A dictionary with sets under 'old_flights', 'new_flights', and 'modified_flights' keys.
-    """
-    
     flight_changes = {
-        'old_flights': set(),
-        'new_flights': set(),
+        'base_flights': set(),
+        'alt_flights': set(),
         'modified_flights': set()
     }
+    
+    flight_changes['base_flights'] = base_flights
+    flight_changes['alt_flights'] = alt_flights
 
-    # Identify new and deleted flights using set operations
-    new_flights = alt_flights - base_flights
-    deleted_flights = base_flights - alt_flights
+    # Create mappings of flights by unique_id
+    base_flights_mapping = {flight.unique_id: flight for flight in base_flights}
+    alt_flights_mapping = {flight.unique_id: flight for flight in alt_flights}
 
-    # Handle new and deleted flights
-    for flight in new_flights:
-        flight_clone = deepcopy(flight)
-        flight_clone.change_status = 'NEW'
-        flight_changes['new_flights'].add(flight_clone)
+    # Identify flights only in base or alt flights
+    base_only_ids = set(base_flights_mapping.keys()) - set(alt_flights_mapping.keys())
+    alt_only_ids = set(alt_flights_mapping.keys()) - set(base_flights_mapping.keys())
 
-    for flight in deleted_flights:
-        flight_clone = deepcopy(flight)
+    # Mark base-only flights as cancelled
+    for flight_id in base_only_ids:
+        flight_clone = deepcopy(base_flights_mapping[flight_id])
         flight_clone.change_status = 'CNL'
-        flight_changes['old_flights'].add(flight_clone)
+        flight_changes['modified_flights'].add(flight_clone)
 
-    # Check for modified flights
-    common_flights = base_flights & alt_flights
-    for flight in common_flights:
-        alt_flight = next(f for f in alt_flights if f.unique_id == flight.unique_id)
+    # Mark alt-only flights as new
+    for flight_id in alt_only_ids:
+        flight_clone = deepcopy(alt_flights_mapping[flight_id])
+        flight_clone.change_status = 'NEW'
+        flight_changes['modified_flights'].add(flight_clone)
 
-        if flight != alt_flight:  # There's a modification
-            flight_clone = deepcopy(flight)
+    # Check for changes other than cancellation or new 
+    for base_id, base_flight in base_flights_mapping.items():
+        if base_id in alt_flights_mapping:
+            alt_flight = alt_flights_mapping[base_id]
 
-            if flight.departure_time != alt_flight.departure_time or flight.arrival_time != alt_flight.arrival_time:
-                flight_clone.change_status = 'TIM'
-            elif flight.equipment != alt_flight.equipment:
-                flight_clone.change_status = 'EQP'
+            if base_flight != alt_flight:  # There's a modification
+                flight_clone = deepcopy(base_flight)
 
-            if flight_clone.change_status:
-                flight_changes['modified_flights'].add(flight_clone)
+                if base_flight.departure_time != alt_flight.departure_time or base_flight.arrival_time != alt_flight.arrival_time:
+                    flight_clone.change_status = 'TIM'
+                elif base_flight.equipment != alt_flight.equipment:
+                    flight_clone.change_status = 'EQP'
+                # Otherwise if anything else changed, mark as 'RPL'
+
+                if flight_clone.change_status:
+                    flight_changes['modified_flights'].add(flight_clone)
 
     return flight_changes
 
@@ -75,6 +73,7 @@ if __name__ == '__main__':
     
     import time 
     import json
+    from models.ssim_file import SSIM_File
     
     start_time = time.time()  # Start timing
 
@@ -82,13 +81,27 @@ if __name__ == '__main__':
     base_dir = Path(__file__).resolve().parent.parent.parent
     base_ssim_path = base_dir / 'data' / 'ssim' / 'EY_SSIM_base_compare.ssim'
     alt_ssim_path = base_dir / 'data' / 'ssim' / 'EY_SSIM_alt_compare.ssim'
+
+    base_object = SSIM_File(base_ssim_path)
+    alt_object = SSIM_File(alt_ssim_path)
+    
+    # Write to excel both base and alt objects.df in two separate sheets
+    with pd.ExcelWriter(base_dir / 'compare_testing.xlsx') as writer:
+        base_object.df.to_excel(writer, sheet_name='base')
+        alt_object.df.to_excel(writer, sheet_name='alt')
+    
+    
     
     base_set = de_serialize(base_ssim_path)
     alt_set = de_serialize(alt_ssim_path)
     
     result = compare_flights(base_set, alt_set)
+    
+    for flight in result['modified_flights']:
+        print(f'{flight} {flight.change_status}')
 
     end_time = time.time()  # End timing
+    
     elapsed_time = end_time - start_time
     print(f"Elapsed Time: {elapsed_time:.2f} seconds")
 
@@ -100,5 +113,6 @@ if __name__ == '__main__':
     result_file_path = base_dir / 'compare_testing.json'
     with open(result_file_path, 'w') as file:
         json.dump(result, file, indent=4)
+
 
     print(f"Results written to {result_file_path}")

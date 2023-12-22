@@ -79,32 +79,3 @@ class FlightSeriesHandler:
         ]
 
         return filtered_series
-
-    def de_serialize(self, ssim_path):
-        
-        # Declare empty Flight objects set 
-        flights = set()
-        
-        # De-serialize a flight series into a set of flights
-        ssim_object = SSIM_File(ssim_path)
-
-        handler = FlightSeriesHandler()
-        series = handler.create_flight_series_from_df(ssim_object.df) 
-                    
-        # Take effective and discountinue date, and create a list of dates in between
-        
-        dates_list = ''
-        
-        
-        # For each date, create a flight object and append to set if the corresponding day of operation is a number and not a .
-        return series
-    
-    if __name__ == '__main__':
-        
-        # Create a flight series handler
-        
-        ssim_path = r'..\data\ssim\EY_SSIM_base_compare.ssim'
-        
-        print(de_serialize(ssim_path))
-        
-        # Create a flight series from a SSIM file
