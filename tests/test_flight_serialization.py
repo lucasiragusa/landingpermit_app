@@ -1,9 +1,8 @@
-import sys
 from pathlib import Path
 import time
 import random
 import pendulum
-import pandas as pd  
+import sys
 from datetime import datetime, timedelta
 
 # Calculate the path to the 'src' directory
@@ -14,32 +13,6 @@ src_dir = root_dir / 'src'
 sys.path.append(str(src_dir))
 
 from models.flight import Flight
-
-
-
-def create_flights(flight_data, start_date, end_date, probability):
-    """
-    Creates a collection of Flight objects within a given date range based on a probability.
-
-    Args:
-        flight_data (dict): Data needed to construct a Flight object, excluding the departure date.
-        start_date (datetime.date): Start date of the date range.
-        end_date (datetime.date): End date of the date range.
-        probability (float): Probability (between 0 and 1) of a flight occurring on each date.
-
-    Returns:
-        list: A list of Flight objects.
-    """
-    flights = []  
-    current_date = start_date
-    while current_date <= end_date:
-        if random.random() < probability:
-            flight_data_for_day = flight_data.copy()
-            flight_data_for_day['Departure Date'] = current_date.strftime('%Y-%m-%d')
-            flights.append(Flight(flight_data_for_day))
-        current_date += datetime.timedelta(days=1)
-    return flights
-
 
 def parse_date(date_str):
     """
@@ -202,7 +175,7 @@ def write_flights_by_week_to_file(flights_by_week, filename, header, mode='a'):
     with open(filename, mode) as file:
         file.write('\n' + header + '\n')
         for week, flight_list in flights_by_week.items():
-            file.write(f'Week {week}: {flight_list}\n')
+            file.write(f'{week}: {flight_list}\n')
 
 def write_transformed_flights_to_file(transformed_flights, filename, header, mode='a'):
     """
@@ -257,16 +230,25 @@ def are_weeks_consecutive(week1, week2):
     Returns:
         bool: True if the weeks are consecutive, False otherwise.
     """
+    import datetime
+
+    def is_53_week_year(year):
+        """
+        Determine if a year has 53 weeks.
+        """
+        last_day_of_year = datetime.date(year, 12, 31)
+        # A year has 53 weeks if the last day of the year or the day before is a Thursday
+        return last_day_of_year.weekday() == 3 or (last_day_of_year - datetime.timedelta(days=1)).weekday() == 3
+
     year1, week_num1 = map(int, week1[1].split('_'))
     year2, week_num2 = map(int, week2[0].split('_'))
 
-    # Check if the weeks are in the same year and consecutive
     if year1 == year2:
         return week_num1 + 1 == week_num2
 
-    # Check for year transition
     if year1 + 1 == year2:
-        return week_num1 == 52 and week_num2 == 1
+        last_week_of_year = 53 if is_53_week_year(year1) else 52
+        return week_num1 == last_week_of_year and week_num2 == 1
 
     return False
 
@@ -285,7 +267,70 @@ def get_first_day_of_isoweek(week_signature):
 
     return date
 
+def adjust_dow_outside_range(week_signature, dow_string, start_date, end_date): 
+    """
+    Adjusts a days-of-week string to exclude days outside a specified date range.
 
+    Args:
+        week_signature (str): A string representing the ISO week, used to determine the week's start day.
+        dow_string (str): A string representing days of the week, where each character is a day (1-7) or '.'.
+        start_date (date): The start date of the range.
+        end_date (date): The end date of the range.
+
+    Returns:
+        str: The adjusted days-of-week string, modified to exclude days outside the specified date range.
+    """
+    dow_string = format_dow_string(dow_string)
+    
+    # Convert the dow_string to a list for modification
+    dow_list = list(dow_string)
+    week_start_day = get_first_day_of_isoweek(week_signature)
+    result_list = [] # This will be the list that we return
+    
+    for i in range(0, 7):
+        interim_day = week_start_day + timedelta(days=i)
+        if interim_day < start_date or interim_day > end_date:
+            result_list.extend(str(i+1))
+        elif dow_list[i] != '.':
+            result_list.extend(str(i+1))
+        else: 
+            result_list.extend('.')
+    
+    # Convert the list back to a string
+    result_string = ''.join(result_list)
+    return result_string
+
+def adjust_dates_outside_range(my_dict, min_dep_date, max_dep_date):
+    """
+    Adjusts the keys of a dictionary to ensure the dates fall within a specified range.
+
+    Args:
+        my_dict (dict): The dictionary with tuple keys representing date ranges.
+        min_dep_date (str): The minimum departure date, in a format parseable by parse_date.
+        max_dep_date (str): The maximum departure date, in a format parseable by parse_date.
+
+    Returns:
+        dict: A new dictionary with adjusted keys to ensure dates fall within the specified range.
+    """
+    min_dep_date = parse_date(min_dep_date)
+    max_dep_date = parse_date(max_dep_date)
+    adjusted_dict = {}
+
+    for key, value in my_dict.items():
+    
+        first_date_str, second_date_str = key
+        first_date = parse_date(first_date_str)
+        second_date = parse_date(second_date_str)
+
+        # Adjusting the first and second date
+        adjusted_first_date = max(first_date, min_dep_date).format('DDMMMYY')
+        adjusted_second_date = min(second_date, max_dep_date).format('DDMMMYY')
+
+        # Creating the new key and assigning the value from the old key
+        new_key = (adjusted_first_date, adjusted_second_date)
+        adjusted_dict[new_key] = value
+
+    return adjusted_dict
 
 
 # TESTING
@@ -309,13 +354,17 @@ if __name__ == '__main__':
     
     # Build parameters for create_flights function
     start_date = '01Nov22'
-    end_date = '02May23'
-    probability = 1  # chance of a flight occurring on any given day
+    end_date = '09May23'
+    probability = 0.98  # chance of a flight occurring on any given day
     flights = create_flights(flight_base_data, start_date, end_date, probability)
     print (f'{len(flights)} flights created')
 
+    if len(flights) == 0:
+        print('No flights created. Exiting...')
+        sys.exit()
+
     # Call the function after flights are created
-    write_flights_to_file(flights, 'flights_all_stages.txt', '--- Stage 1: Flights Created ---', mode='w')  # 'w' to write from the beginning
+    write_flights_to_file(flights, 'flights_all_stages.txt', '--- Stage 1: Flights Created ---', mode='w')
 
     # Take lowest and highest departure date from list of flights 
     min_dep_date = min(flights, key=lambda x: parse_date(x.departure_date)).departure_date
@@ -344,8 +393,7 @@ if __name__ == '__main__':
         flights_by_week_new[week] = ''
         
         for weekday in range(1, 8):
-            # Check if there's a flight on this weekday or if the flight's departure date is outside the specified range
-            
+            # Check if there's a flight on this weekday
             for flight in flight_list:
                 if (flight.weekday == weekday):
                     flights_by_week_new[week] += str(weekday)
@@ -359,79 +407,38 @@ if __name__ == '__main__':
     write_flights_by_week_to_file(flights_by_week, 'flights_all_stages.txt', '--- Stage 2: Flights by Week ---')
     
     # Now handle dates that are outside the range of start and end date
-    
-    first_key = next(iter(flights_by_week.keys()))
-    last_key = next(reversed(flights_by_week.keys()))
+    adjusted_dictionary = {
+        week_signature: adjust_dow_outside_range(week_signature[0], dow_string, start_date, end_date)
+        for week_signature, dow_string in flights_by_week.items()
+    }
 
-    print (f'First key: {first_key}')
-    print (f'Last key: {last_key}')
-
-    # For the first week
-    first_day_of_first_isoweek = get_first_day_of_isoweek(first_key[0])
-    # And for the last week
-    last_day_of_last_isoweek = get_first_day_of_isoweek(last_key[0]) + timedelta(days=6)
-    
-    dow_string = flights_by_week[first_key]
-
-    # Convert the dow_string to a list for modification
-    dow_list = list(dow_string)
-
-    for i in range(0, 7):
-        if first_day_of_first_isoweek + timedelta(days=i) < start_date:
-            dow_list[i] = str(i+1)
-    
-    # Convert the list back to a string
-    dow_string = ''.join(dow_list)
-    
-    # Assign the modified dow_string to the first week
-    flights_by_week[first_key] = dow_string
-    
-    # Repeat the same process for the last week
-    dow_string = flights_by_week[last_key]
-    dow_list = list(dow_string)
-    
-    for i in range(0, 7):
-        if last_day_of_last_isoweek + timedelta(days=i) > end_date:
-            dow_list[i] = str(i+1)
-    
-    dow_string = ''.join(dow_list)
-    
-    flights_by_week[last_key] = dow_string
-    
+    flights_by_week = adjusted_dictionary.copy()
+     
     # Write intermediate step for debugging purposes
     write_flights_by_week_to_file(flights_by_week, 'flights_all_stages.txt', '--- Stage 2.5: Flights by Week after handling dates outside range ---')
     
+    print ("Done writing intermediate step")
+    
     # Now we need to merge consecutive weeks that have the same weekday pattern
-    flights_by_week = flights_by_week = transformed_flights = transform_week_signatures(merge_dict_pairs(flights_by_week))
+    transformed_flights = transform_week_signatures(merge_dict_pairs(flights_by_week))
 
     end_time = time.time()
     elapsed_time = end_time - start_time
     
+    print (f'Intermediate check: {transformed_flights}')
+    for k,v in transformed_flights.items():
+        print (f'Week {k}: {v}')
+    
+    transformed_flights = adjust_dates_outside_range(transformed_flights, min_dep_date, max_dep_date)
+    transformed_flights = dict(sorted(transformed_flights.items(), key=lambda x: parse_date(x[0][0])))
+
     # Assuming transformed_flights is a list or similar iterable
     write_transformed_flights_to_file(transformed_flights, 'flights_all_stages.txt', f'--- Stage 3: Flight Series Minimal Representation --- Elapsed time: {elapsed_time} seconds')
     
-    # 
 
     #TODO: Add an additional piece of logic to ensure that we are showing the minimum representation: 
         # Count the contiguous number of days with consecutive flights. 
         # If the number of intervals resulting from using the with consecutive flights representation is less than the number of intervals represented
         # with the dot notation, then we should use the consecutive flights representation.
-
-    # TODO: Address the edge case where there are two weeks after one another that share the same weekday pattern but aren't consecutive. 
-    # For example:
     
-    # --- Stage 2: Flights by Week ---
-    # Week ('2023_5', '2023_5'): ...4... #This could accidentally be merged with the next week
-    # Week ('2023_10', '2023_10'): ...4... #This could accidentally be merged with the previous week
-    # Week ('2023_16', '2023_16'): ....5..
-    
-    # They should not be merged and should be represented as two separate weeks.
-    # To do this, we will need a function that checks if two weeks are consecutive.
-    
-    # TODO: Add an additional function at the very last that for each key of the dictionary, for the first tuple element
-    # Takes the max of start_date and tuple element
-    # And for the second element takes the min of tuple element and end_date
-    
-    
-    print('Start test of isoweek')
-    print (f' 2023_5 start day: {get_first_day_of_isoweek('2023_5')}')
+    #TODO: Turn this test case into a function that can be called on a list of flights that don't include a single type of flights

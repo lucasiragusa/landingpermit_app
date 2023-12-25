@@ -41,7 +41,8 @@ class Flight:
         self.year = self.isocalendar[0]
         self.isoweek = self.isocalendar[1]
         self.weekday = self.isocalendar[2]
-        self.week_signature = str(self.year) + '_' + str(self.isoweek)
+        self.week_signature = str(self.year) + '_' + str(self.isoweek).zfill(2)
+
 
     def _repr__(self):
         return f'{self.flight_number} {self.departure_date} {self.departure_time} {self.arrival_time} ({self.week_signature}) Weekday: {self.weekday}'
