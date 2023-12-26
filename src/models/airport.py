@@ -1,4 +1,6 @@
 import pandas as pd
+from pathlib import Path
+
 
 class Airport: 
         
@@ -43,5 +45,11 @@ class Airport:
                      self.timezone))
 
 
-airport_data = pd.read_pickle('./data/industry/airport_data.pkl')
+# Calculate the path relative to the current file
+current_file_path = Path(__file__).resolve()
+project_root = current_file_path.parent.parent.parent  # Navigate up to the project root
+data_file_path = project_root / 'data' / 'industry' / 'airport_data.pkl'  # Construct the path to the data file
+
+# Load the data
+airport_data = pd.read_pickle(data_file_path)
 

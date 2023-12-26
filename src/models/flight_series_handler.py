@@ -7,12 +7,11 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 from models.flight_series import FlightSeries
 from models.airport import Airport
 from models.airport import airport_data
-<<<<<<< HEAD
 from models.flight import Flight
-=======
 from models.ssim_file import SSIM_File
->>>>>>> 7-compare-logic
+from utils.pendulum_helper import pendulum_to_string, reformat_date_signature, parse_date
 import pendulum
+
 
 class FlightSeriesHandler:
     def __init__(self):
@@ -95,7 +94,7 @@ class FlightSeriesHandler:
         """
         return pendulum.from_format(date_str, 'DDMMMYY')
 
-    def de_serialize(self, flight_series_collection):
+    def de_serialize_flight_series(self, flight_series_collection):
         '''
         Converts a collection of FlightSeries objects to a list of flight objects.   
         '''
@@ -106,11 +105,28 @@ class FlightSeriesHandler:
             raise ValueError('No flight series in collection.')
         
         for series in self.flight_series_collection:
-            eff_date = self.parse_date(series.effective_date)
-            dis_date = self.parse_date(series.discontinued_date)
+            print (f'effective date: {series.effective_date}')  #debug
+            eff_date = reformat_date_signature(series.effective_date)
+            dis_date = reformat_date_signature(series.discontinued_date)
 
             # Iterate over all dates in the flight series
-            for date in pendulum.period(eff_date, dis_date):
+            for date in pendulum.interval(parse_date(eff_date), parse_date(dis_date)).range('days'):
                 # Check if the flight operates on the current date
                 if str(date.isoweekday()) in series.days_of_operation:
                     # Create a flight object
+                    flight_data = {
+                        'Airline designator': series.airline_designator,
+                        'Flight number': series.flight_number,
+                        'Service Type': series.service_type,
+                        'Departure Date': pendulum_to_string(date),
+                        'Dept Stn': series.departure_station.iata_code,
+                        'Dept time (pax)': series.departure_time,
+                        'Arvl Stn': series.arrival_station.iata_code,
+                        'Arvl time (pax)': series.arrival_time,
+                        'Equipment': series.equipment,
+                        'Aircraft configuration': series.aircraft_configuration
+                    }
+                    flight = Flight(flight_data)
+                    flight_collection.append(flight)
+        return flight_collection
+    

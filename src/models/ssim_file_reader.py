@@ -4,6 +4,7 @@ import pandas as pd
 class SSIMFileReader:
 
     def __init__(self, ssim_file_path):
+        print (f'Creating SSIMFileReader object for {ssim_file_path}')
         self.ssim_file_path = ssim_file_path
 
     def get_attributes(self):
