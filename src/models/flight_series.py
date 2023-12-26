@@ -51,7 +51,17 @@ class FlightSeries:
         #Add IATA Season
 
     def __repr__(self):
-        return f"{self.airline_designator} {self.flight_number}: {self.departure_station}-{self.arrival_station} ({self.effective_date}-{self.discontinued_date})"
+        
+        self.days_of_operation = self.days_of_operation.replace(' ', '')
+        temp_string = ''
+        for i in range (1,8): 
+            if str(i) in self.days_of_operation:
+                temp_string += str(i)
+            else: 
+                temp_string += '.'
+        self.days_of_operation = temp_string
+        
+        return f"{self.airline_designator} {self.flight_number}: {self.departure_station}-{self.arrival_station} ({self.effective_date}-{self.discontinued_date}) {self.days_of_operation}"
     
     def to_dict(self):
         return {

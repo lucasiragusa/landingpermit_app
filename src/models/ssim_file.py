@@ -4,7 +4,7 @@ from collections import namedtuple
 import sys
 from models.ssim_file_reader import SSIMFileReader
 from models.seasons_handler import DateSeasonHandler
-from models.flight_series_handler import FlightSeriesHandler
+
 
 class SSIM_File: 
     '''This class initiates a SSIM file object. 
@@ -13,9 +13,11 @@ class SSIM_File:
     '''
 
     def __init__(self, ssim_file_path):
+        
+        from models.flight_series_handler import FlightSeriesHandler
+        
         self.reader = SSIMFileReader(ssim_file_path)
         self.attributes = self.reader.get_attributes()
-        print(self.attributes)
         attributes = self.reader.get_attributes()
         self.timezone_mode = attributes['timezone_mode']
         self.start_date = attributes['start_date']

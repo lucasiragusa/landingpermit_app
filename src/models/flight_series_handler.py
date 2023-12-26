@@ -1,7 +1,17 @@
+
+import sys
+from pathlib import Path
+
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+
 from models.flight_series import FlightSeries
 from models.airport import Airport
 from models.airport import airport_data
+<<<<<<< HEAD
 from models.flight import Flight
+=======
+from models.ssim_file import SSIM_File
+>>>>>>> 7-compare-logic
 import pendulum
 
 class FlightSeriesHandler:
@@ -104,9 +114,3 @@ class FlightSeriesHandler:
                 # Check if the flight operates on the current date
                 if str(date.isoweekday()) in series.days_of_operation:
                     # Create a flight object
-                    
-
-        
-        
-        
-
