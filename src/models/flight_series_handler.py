@@ -2,6 +2,7 @@ from models.flight_series import FlightSeries
 from models.airport import Airport
 from models.airport import airport_data
 from models.flight import Flight
+import pendulum
 
 class FlightSeriesHandler:
     def __init__(self):
@@ -39,7 +40,6 @@ class FlightSeriesHandler:
         
         return countries
 
-
     def add_flight_series(self, flight_series_data):
         flight_series = FlightSeries(flight_series_data)
         self.flight_series_collection.append(flight_series)
@@ -72,3 +72,41 @@ class FlightSeriesHandler:
         ]
 
         return filtered_series
+
+    def parse_date(date_str):
+        """
+        Parses a date string in a specific format to a datetime object.
+
+        Args:
+            date_str (str): Date string in '01May23' format.
+
+        Returns:
+            datetime.date: Parsed date.
+        """
+        return pendulum.from_format(date_str, 'DDMMMYY')
+
+    def de_serialize(self, flight_series_collection):
+        '''
+        Converts a collection of FlightSeries objects to a list of flight objects.   
+        '''
+        
+        flight_collection = [] #Declare the output flight collection
+        
+        if len(self.flight_series_collection) == 0:
+            raise ValueError('No flight series in collection.')
+        
+        for series in self.flight_series_collection:
+            eff_date = self.parse_date(series.effective_date)
+            dis_date = self.parse_date(series.discontinued_date)
+
+            # Iterate over all dates in the flight series
+            for date in pendulum.period(eff_date, dis_date):
+                # Check if the flight operates on the current date
+                if str(date.isoweekday()) in series.days_of_operation:
+                    # Create a flight object
+                    
+
+        
+        
+        
+

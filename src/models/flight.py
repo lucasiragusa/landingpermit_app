@@ -17,7 +17,7 @@ class Flight:
         airline_designator (str): The IATA Designator of the Operating Airline.
         flight_number (str): The flight number.
         service_type (str): SSIM-compliant Service type indicating the type of flight (e.g. scheduled pax, cargo, etc.)
-        departure_date (str): The departure date of the flight.
+        departure_date (str): The departure date of the flight. (DDMMMYY)
         departure_station (Airport): The airport from which the flight departs.
         departure_time (str): The scheduled departure time of the flight.
         arrival_station (Airport): The airport at which the flight arrives.
