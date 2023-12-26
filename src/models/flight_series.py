@@ -13,8 +13,8 @@ class FlightSeries:
         airline_designator (str): The IATA Designator of the Operating Airline.
         flight_number (str): The flight number. 
         service_type (str): SSIM-compliant Service type indicating the type of flight (e.g. scheduled pax, cargo, etc.)
-        effective_date (str): The starting date from which the flight series is effective.
-        discontinued_date (str): The date after which the flight series is no longer operational.
+        effective_date (str): The starting date from which the flight series is effective, in DDMMMYY format.
+        discontinued_date (str): The date after which the flight series is no longer operational, in DDMMMYY format.
         days_of_operation (str): Days of the week on which the flight operates.(Monday = 1)
         departure_station (Airport): The airport from which the flight departs.
         departure_time (str): The scheduled departure time of the flight.

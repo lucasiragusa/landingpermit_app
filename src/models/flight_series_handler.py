@@ -1,6 +1,7 @@
 from models.flight_series import FlightSeries
 from models.airport import Airport
 from models.airport import airport_data
+from models.flight import Flight
 
 class FlightSeriesHandler:
     def __init__(self):
@@ -71,5 +72,3 @@ class FlightSeriesHandler:
         ]
 
         return filtered_series
-
-

@@ -13,6 +13,7 @@ src_dir = root_dir / 'src'
 sys.path.append(str(src_dir))
 
 from models.flight import Flight
+from models.flight_series import FlightSeries
 
 def parse_date(date_str):
     """
@@ -425,9 +426,6 @@ if __name__ == '__main__':
     end_time = time.time()
     elapsed_time = end_time - start_time
     
-    print (f'Intermediate check: {transformed_flights}')
-    for k,v in transformed_flights.items():
-        print (f'Week {k}: {v}')
     
     transformed_flights = adjust_dates_outside_range(transformed_flights, min_dep_date, max_dep_date)
     transformed_flights = dict(sorted(transformed_flights.items(), key=lambda x: parse_date(x[0][0])))
@@ -441,4 +439,4 @@ if __name__ == '__main__':
         # If the number of intervals resulting from using the with consecutive flights representation is less than the number of intervals represented
         # with the dot notation, then we should use the consecutive flights representation.
     
-    #TODO: Turn this test case into a function that can be called on a list of flights that don't include a single type of flights
+    #TODO: Turn this test case into a function that can be called on a list of flights that don't include a single type of flights 
