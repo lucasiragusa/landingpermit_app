@@ -41,8 +41,10 @@ class Flight:
         self.service_type = flight_data['Service Type']
         self.departure_date = flight_data['Departure Date']
         self.departure_station = Airport(flight_data['Dept Stn'])
+        self.departure_station_iata_code = flight_data['Dept Stn']
         self.departure_time = flight_data['Dept time (pax)']
         self.arrival_station = Airport(flight_data['Arvl Stn'])
+        self.arrival_station_iata_code = flight_data['Arvl Stn']
         self.arrival_time = flight_data['Arvl time (pax)']
         self.equipment = flight_data['Equipment']
         self.aircraft_configuration = flight_data['Aircraft configuration']

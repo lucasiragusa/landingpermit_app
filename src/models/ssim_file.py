@@ -106,3 +106,15 @@ class SSIM_File:
     def export_to_csv(self, filename):
         self.df.to_csv(filename, index=False)
 
+    def de_serialize(self):
+        '''
+        Converts a collection of FlightSeries objects to a list of flight objects.   
+        '''
+        flight_collection = self.flight_series_list
+        
+        handler = self.flight_series_handler
+        
+        flight_list = handler.de_serialize_flight_series(flight_collection)
+        
+        return flight_list
+

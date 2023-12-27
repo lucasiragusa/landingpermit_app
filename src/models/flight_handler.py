@@ -31,5 +31,23 @@ class FlightHandler:
 
         return filtered_flights
 
+    def group_flights(self, flight_list, attributes=None):
+        
+        if attributes is None:
+            attributes = ['airline_designator', 'flight_number', 'service_type',
+                          'departure_station_iata_code', 'departure_time', 'arrival_station_iata_code',
+                          'arrival_time', 'equipment', 'aircraft_configuration']
+
+        grouped_flights = {}
+
+        for flight in flight_list:
+            key = tuple(getattr(flight, attr) for attr in attributes)
+            if key in grouped_flights:
+                grouped_flights[key].append(flight)
+            else:
+                grouped_flights[key] = [flight]
+
+        return grouped_flights
+
     def __str__(self):
         return f'FlightHandler with {len(self.flights)} flights'

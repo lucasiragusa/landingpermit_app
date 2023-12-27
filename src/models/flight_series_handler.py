@@ -95,6 +95,7 @@ class FlightSeriesHandler:
         return pendulum.from_format(date_str, 'DDMMMYY')
 
     def de_serialize_flight_series(self, flight_series_collection):
+        
         '''
         Converts a collection of FlightSeries objects to a list of flight objects.   
         '''
@@ -105,7 +106,6 @@ class FlightSeriesHandler:
             raise ValueError('No flight series in collection.')
         
         for series in self.flight_series_collection:
-            print (f'effective date: {series.effective_date}')  #debug
             eff_date = reformat_date_signature(series.effective_date)
             dis_date = reformat_date_signature(series.discontinued_date)
 

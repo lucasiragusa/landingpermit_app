@@ -14,6 +14,7 @@ sys.path.append(str(src_dir))
 
 from models.flight import Flight
 from models.flight_series import FlightSeries
+from utils.pendulum_helper import reformat_date_signature
 
 def parse_date(date_str):
     """
@@ -291,6 +292,9 @@ def serialize_flights(flights):
     if isinstance(flights, set):
         flights = list(flights)
     
+    # sort by departure date as pendulum object, with the lowest departure date first
+    flights = sorted(flights, key=lambda x: parse_date(x.departure_date), reverse=False)
+    
     # Save the attributes of first flight in the list to it can be used to create a flight series object at the end
     first_flight = flights[0]
     attributes_dict = first_flight.__dict__
@@ -301,6 +305,11 @@ def serialize_flights(flights):
     
     # Define format string for desired format
     date_format = "%d%b%y"
+    
+    
+    # Determine first day of first week of flights and last day of last week of flights
+    start_date = get_first_day_of_isoweek(flights[0].week_signature).strftime(date_format)
+    end_date = get_first_day_of_isoweek(flights[-1].week_signature).add(days=6).strftime(date_format)
     
     # Convert dates to pendulum objects for future use
     start_date = parse_date(start_date)
@@ -369,6 +378,3 @@ def serialize_flights(flights):
         flight_series.append(FlightSeries(new_flight_series_dict))
     
     return flight_series
-        
-        
-        

@@ -1,5 +1,13 @@
+import sys
+from pathlib import Path
+import pendulum
+
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+
 from models.airport import airport_data
 from models.airport import Airport
+from utils.pendulum_helper import reformat_date_signature, parse_date
+
 
 class FlightSeries: 
 
@@ -46,7 +54,20 @@ class FlightSeries:
         self.arrival_time = flight_series_data['Arvl time (pax)']
         self.equipment = flight_series_data['Equipment']
         self.aircraft_configuration = flight_series_data['Aircraft configuration']
-        #Add count of Flights in flight series
+        
+        # Determine how many flights are in the flight series
+        self.no_of_flights = 0
+        
+        eff_date = reformat_date_signature(self.effective_date)
+        dis_date = reformat_date_signature(self.discontinued_date)
+        
+        # print ('Debug eff date format is', eff_date)
+        # print ('Debug dis date format is', dis_date)
+        
+        for date in pendulum.interval(parse_date(eff_date), parse_date(dis_date)).range('days'):
+            if str(date.isoweekday()) in self.days_of_operation:
+                self.no_of_flights += 1
+
         #Add time mode (local/UTC) in arguments to constructor
         #Add IATA Season
 
@@ -78,3 +99,6 @@ class FlightSeries:
             'Equipment': self.equipment,
             'Aircraft configuration': self.aircraft_configuration
         }
+        
+    def __str__(self):
+        return f'{self.airline_designator} {self.flight_number} {self.departure_station}-{self.arrival_station} Date interval:{self.effective_date}-{self.discontinued_date} Days of ops: {self.days_of_operation}'

@@ -3,8 +3,9 @@
 from models.ssim_file import SSIM_File
 from models.airport import Airport
 from models.flight_series_handler import FlightSeriesHandler
+from models.flight_handler import FlightHandler
 from lib.permit_generator import generate_document
-import time #debug
+from lib.serialize_flights import serialize_flights
 
 import sys
 import os
@@ -17,8 +18,9 @@ sys.path.append(str(Path(__file__).parent.resolve()))
 
 
 def main(): 
-    import numpy as np 
     
+    print (f'Main executing.')
+     
     # Get the SSIM file path from the command line argument
     ssim_relative_path = sys.argv[1]
 
@@ -32,13 +34,14 @@ def main():
 
     ssim_object = SSIM_File(str(ssim_absolute_path))
 
-    handler = FlightSeriesHandler()
+    series_handler = FlightSeriesHandler()
+    flight_handler = FlightHandler()
     # handler.create_flight_series_from_df(ssim_object.df)
 
     # # If you want to print all unique countries present in the flight series
     # unique_countries = handler.get_unique_countries()
 
-    # # Filter by a specific country and print results.
+    # # Filter by a specific country and print results.  
     # for country_code in unique_countries:
     #     print (f'Creating permit for: {country_code}')
         
@@ -50,18 +53,74 @@ def main():
     #     print(f'Time taken for {country_code}: {duration:.2f} seconds\n')
     
     # Test ssim read to df
-    ssim_object.df.to_clipboard(index=False)
-    
+    ssim_object.df.to_csv('../tests/ssim_df.csv', index=False)
+        
     # test de-serializing ssim before 
-    handler.create_flight_series_from_df(ssim_object.df)
     
-    flight_list = handler.de_serialize_flight_series(handler.flight_series_collection)
+    flight_list = ssim_object.de_serialize()
     
-    for flight in flight_list: 
-        print (flight)
-        # write the result in a flight_test.txt
-        with open('flight_test.txt', 'a') as f: 
-            f.write(str(flight) + '\n')
+    flight_list_grouped = flight_handler.group_flights(flight_list)
+    
+    print (f'Flights list_grouped: {flight_list_grouped}')
+    
+    for flight_group, flight in flight_list_grouped.items():
+        print(flight_group)
+        for f in flight:
+            print(f)
+        print('\n')
+def main_2(): 
+    output_file_path = '../tests/output.txt'
 
-if __name__ == '__main__':
-    main()
+    with open(output_file_path, 'w') as file:
+        file.write('Main executing.\n')
+        file.flush()
+        
+        ssim_relative_path = sys.argv[1]
+        ssim_path = Path(ssim_relative_path)
+        ssim_absolute_path = ssim_path.resolve()
+        file.write(f'SSIM path: {ssim_absolute_path}\n')
+        file.flush()
+
+        # Assuming SSIM_File, FlightSeriesHandler, FlightHandler are defined elsewhere
+        ssim_object = SSIM_File(str(ssim_absolute_path))
+
+        series_handler = FlightSeriesHandler()
+        flight_handler = FlightHandler()
+
+        # Your existing code for handling SSIM file and flights...
+
+        ssim_object.df.to_csv('../tests/ssim_df.csv', index=False)
+
+        flight_list = ssim_object.de_serialize()
+        flight_list_grouped = flight_handler.group_flights(flight_list)
+        
+        file.write(f'Flights list_grouped: {flight_list_grouped}\n')     
+        file.flush()
+        
+        for flight_group, flights in flight_list_grouped.items():
+                    
+            file.write(f'flight group: \n')
+            file.write(f'{flight_group}\n')
+            file.write(f'Processing flight: \n')
+            file.write(f'{flights[0]}\n')
+            
+            file.flush()
+            
+            file.write(f'Serialized flights: \n')
+            # Assuming serialize_flights() returns a string representation of flights
+            serialized_flights = serialize_flights(flights)
+            file.write(f'{serialized_flights}\n')
+            file.flush()
+            
+            file.write(f'Flights: \n')
+            
+            for f in flights:
+                file.write(f'{f}\n')
+            file.write('\n')
+            file.flush()
+            
+            
+
+if __name__ == '__main__': 
+    main_2()
+
