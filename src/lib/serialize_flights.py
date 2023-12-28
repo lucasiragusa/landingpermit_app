@@ -355,11 +355,12 @@ def serialize_flights(flights):
     
     transformed_flights = adjust_dates_outside_range(transformed_flights, min_dep_date, max_dep_date)
     transformed_flights = dict(sorted(transformed_flights.items(), key=lambda x: parse_date(x[0][0])))
-    
+        
     # Initiate list that will contain outopur flight series
     flight_series = []
     
-    for date_range, dow_string in transformed_flights: 
+    for date_range, dow_string in transformed_flights.items(): 
+
         new_flight_series_dict = {
         'Airline designator' : attributes_dict['airline_designator'], 
         'Flight number' : attributes_dict['flight_number'], 

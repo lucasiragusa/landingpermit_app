@@ -6,6 +6,7 @@ from models.flight_series_handler import FlightSeriesHandler
 from models.flight_handler import FlightHandler
 from lib.permit_generator import generate_document
 from lib.serialize_flights import serialize_flights
+import time
 
 import sys
 import os
@@ -68,8 +69,11 @@ def main():
         for f in flight:
             print(f)
         print('\n')
+
+
 def main_2(): 
     output_file_path = '../tests/output.txt'
+    start_time = time.time() 
 
     with open(output_file_path, 'w') as file:
         file.write('Main executing.\n')
@@ -78,6 +82,7 @@ def main_2():
         ssim_relative_path = sys.argv[1]
         ssim_path = Path(ssim_relative_path)
         ssim_absolute_path = ssim_path.resolve()
+        
         file.write(f'SSIM path: {ssim_absolute_path}\n')
         file.flush()
 
@@ -94,30 +99,40 @@ def main_2():
         flight_list = ssim_object.de_serialize()
         flight_list_grouped = flight_handler.group_flights(flight_list)
         
-        file.write(f'Flights list_grouped: {flight_list_grouped}\n')     
-        file.flush()
+        # file.write(f'Flights list_grouped: {flight_list_grouped}\n')     
+        # file.flush()
         
         for flight_group, flights in flight_list_grouped.items():
                     
             file.write(f'flight group: \n')
             file.write(f'{flight_group}\n')
-            file.write(f'Processing flight: \n')
-            file.write(f'{flights[0]}\n')
             
             file.flush()
             
             file.write(f'Serialized flights: \n')
-            # Assuming serialize_flights() returns a string representation of flights
             serialized_flights = serialize_flights(flights)
-            file.write(f'{serialized_flights}\n')
+            file.write(f'\n')
+            
+            for series in serialized_flights:
+                file.write(f'{series}\n')
+            file.write(f'\n')
+            
+            file.write(f'-----------------------------------\n')
+            
             file.flush()
             
-            file.write(f'Flights: \n')
-            
-            for f in flights:
-                file.write(f'{f}\n')
-            file.write('\n')
+            end_time = time.time()  # End the timer
             file.flush()
+
+        elapsed_time = end_time - start_time
+        print (f'Executed in: {elapsed_time} seconds')
+
+            # file.write(f'Flights: \n')
+            
+            # for f in flights:
+            #     file.write(f'{f}\n')
+            # file.write('\n')
+            # file.flush()
             
             
 

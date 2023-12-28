@@ -112,11 +112,29 @@ def reformat_date_signature(date_str):
 
     Returns:
         str: Reformatted date string in '01Jan23' format.
+
+    Raises:
+        ValueError: If the date_str does not match the expected format.
     """
+    # Check if date_str is 7 characters long
+    if len(date_str) != 7:
+        raise ValueError(f"{date_str} does not match format: length is not 7 characters")
+
     # Extract day, month, and year parts
     day = date_str[:2]
     month = date_str[2:5]
     year = date_str[5:]
+
+    # Validate day and year are numeric
+    if not (day.isdigit() and year.isdigit()):
+        raise ValueError(f"{date_str} does not match format: day and year are not numeric")
+
+    # List of valid month abbreviations
+    valid_months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"]
+
+    # Validate month
+    if month.upper() not in valid_months:
+        raise ValueError(f"{date_str} does not match format: month is not valid")
 
     # Reformat month to title case
     month = month.title()
