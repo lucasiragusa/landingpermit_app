@@ -26,7 +26,7 @@ class FlightSeriesHandler:
         return self.flight_series_collection
 
 
-    def get_unique_countries(self):
+    def get_unique_countries(self, flight_series_collection):
         """Return a set of all unique countries from the flight series."""
 
         # Using a helper function to determine the country of an airport.
@@ -36,7 +36,7 @@ class FlightSeriesHandler:
             
         countries = set()
 
-        for series in self.flight_series_collection:
+        for series in flight_series_collection:
             departure_country = get_country(series.departure_station.iata_code)
             arrival_country = get_country(series.arrival_station.iata_code)
 
@@ -102,10 +102,10 @@ class FlightSeriesHandler:
         
         flight_collection = [] #Declare the output flight collection
         
-        if len(self.flight_series_collection) == 0:
+        if len(flight_series_collection) == 0:
             raise ValueError('No flight series in collection.')
         
-        for series in self.flight_series_collection:
+        for series in flight_series_collection:
             eff_date = reformat_date_signature(series.effective_date)
             dis_date = reformat_date_signature(series.discontinued_date)
 

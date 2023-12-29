@@ -63,6 +63,24 @@ def compare_flights(base_flights, alt_flights):
 
     return flight_changes
 
+def get_countries_with_changes(modified_flights):
+    """
+    Extracts a unique list of departure and arrival countries from modified flights.
+
+    Args:
+    modified_flights (set of Flight objects): A set of modified Flight objects.
+
+    Returns:
+    list: A unique list of all departure and arrival countries from modified flights.
+    """
+    countries = set()
+
+    for flight in modified_flights:
+        countries.add(flight.departure_country)
+        countries.add(flight.arrival_country)
+
+    return list(countries)
+
 
 
 # To Test this, we will be reading an SSIM Files, which produces FLight_series 

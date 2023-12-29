@@ -48,6 +48,8 @@ class Flight:
         self.arrival_time = flight_data['Arvl time (pax)']
         self.equipment = flight_data['Equipment']
         self.aircraft_configuration = flight_data['Aircraft configuration']
+        self.departure_country = airport_data.get(self.departure_station_iata_code)['ISO country']
+        self.arrival_country = airport_data.get(self.arrival_station_iata_code)['ISO country']
         
         # Arguments that can be calculated from the above:
         self.isocalendar = pendulum.from_format(self.departure_date, 'DDMMMYY').isocalendar()
@@ -55,6 +57,7 @@ class Flight:
         self.isoweek = self.isocalendar[1]
         self.weekday = self.isocalendar[2]
         self.week_signature = str(self.year) + '_' + str(self.isoweek).zfill(2)
+        self.unique_id = self.flight_number + '_' + self.departure_date
         self.change_status = None
 
     def __repr__(self):

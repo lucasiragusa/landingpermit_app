@@ -4,6 +4,8 @@ from collections import namedtuple
 import sys
 from models.ssim_file_reader import SSIMFileReader
 from models.seasons_handler import DateSeasonHandler
+from models.flight import Flight
+from utils.pendulum_helper import parse_date, pendulum_to_string, reformat_date_signature
 
 
 class SSIM_File: 
@@ -106,15 +108,52 @@ class SSIM_File:
     def export_to_csv(self, filename):
         self.df.to_csv(filename, index=False)
 
+    # def de_serialize(self):
+    #     '''
+    #     Converts a collection of FlightSeries objects to a list of flight objects.   
+    #     '''
+    #     flight_collection = self.flight_series_list
+        
+    #     handler = self.flight_series_handler
+        
+    #     flight_list = handler.de_serialize_flight_series(flight_collection)
+        
+    #     return flight_list
+    
     def de_serialize(self):
+        
         '''
         Converts a collection of FlightSeries objects to a list of flight objects.   
         '''
-        flight_collection = self.flight_series_list
         
-        handler = self.flight_series_handler
+        flight_series_collection = self.flight_series_list
         
-        flight_list = handler.de_serialize_flight_series(flight_collection)
+        flight_collection = [] #Declare the output flight collection
         
-        return flight_list
+        if len(flight_series_collection) == 0:
+            raise ValueError('No flight series in collection.')
+        
+        for series in flight_series_collection:
+            eff_date = reformat_date_signature(series.effective_date)
+            dis_date = reformat_date_signature(series.discontinued_date)
 
+            # Iterate over all dates in the flight series
+            for date in pendulum.interval(parse_date(eff_date), parse_date(dis_date)).range('days'):
+                # Check if the flight operates on the current date
+                if str(date.isoweekday()) in series.days_of_operation:
+                    # Create a flight object
+                    flight_data = {
+                        'Airline designator': series.airline_designator,
+                        'Flight number': series.flight_number,
+                        'Service Type': series.service_type,
+                        'Departure Date': pendulum_to_string(date),
+                        'Dept Stn': series.departure_station.iata_code,
+                        'Dept time (pax)': series.departure_time,
+                        'Arvl Stn': series.arrival_station.iata_code,
+                        'Arvl time (pax)': series.arrival_time,
+                        'Equipment': series.equipment,
+                        'Aircraft configuration': series.aircraft_configuration
+                    }
+                    flight = Flight(flight_data)
+                    flight_collection.append(flight)
+        return flight_collection
