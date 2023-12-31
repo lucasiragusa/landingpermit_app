@@ -1,0 +1,11 @@
+Metadata-Version: 2.1
+Name: landingpermit-app
+Version: 0.1
+Requires-Dist: numpy
+Requires-Dist: pandas==2.0.3
+Requires-Dist: pendulum==2.1.2
+Requires-Dist: python-dateutil==2.8.2
+Requires-Dist: pytz==2023.3
+Requires-Dist: pytzdata==2020.1
+Requires-Dist: six==1.16.0
+Requires-Dist: tzdata==2023.3
