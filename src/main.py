@@ -1,4 +1,12 @@
 
+import sys
+from pathlib import Path
+
+main_path = Path(__file__).resolve().parent
+
+if str(main_path) not in sys.path:
+    sys.path.append(str(main_path))
+
 # Right now this main to be used as testbed
 from models.ssim_file import SSIM_File
 from models.airport import Airport
@@ -13,11 +21,8 @@ import sys
 import os
 import pandas as pd
 import pendulum
-
-# TODO: install as package instead
-from pathlib import Path
-sys.path.append(str(Path(__file__).parent.resolve()))
-
+import zipfile
+import io
 
 def test_batch(): 
          
@@ -64,8 +69,48 @@ def test_batch():
 
         duration = end_time - start_time
         print(f'Time taken for {country_code}: {duration:.2f} seconds\n')
+
+def test_batch_streamlit(uploaded_file): 
+         
+    # Get the SSIM file path from the uploaded file
+    ssim_object = SSIM_File(str(uploaded_file))
+
+    # Declare handlers
+    series_handler = FlightSeriesHandler()
+    flight_handler = FlightHandler()
     
+    # Create flight series from SSIM file
+    series_handler.create_flight_series_from_df(ssim_object.df)
+
+    # De-serialize the Flight series to Flight objects
+    flight_list = series_handler.de_serialize_flight_series(series_handler.flight_series_collection)
+
+    # Re-serialize the Flight objects to FlightSeries objects 
+    flight_list_grouped = flight_handler.group_flights(flight_list) #First create groupings 
+    serialized_flights = []
     
+    for k, v in flight_list_grouped.items():
+        serialized_flights.append(serialize_flights(v))
+
+    # Flatten the resulting list of lists of FlightSeries objects
+    serialized_flights = [item for sublist in serialized_flights for item in sublist]
+
+    # Get all unique countries from the SSIM file
+    unique_countries = series_handler.get_unique_countries(serialized_flights)
+
+    # print (serialized_flights)
+    
+    # Output to a ZIP file
+    zip_buffer = io.BytesIO()
+    with zipfile.ZipFile(zip_buffer, 'a', zipfile.ZIP_DEFLATED, False) as zip_file:
+        for country_code in unique_countries:
+            # Assuming generate_document_from_flight_series creates files, save them to the zip
+            file_path = generate_document_from_flight_series(country_code, serialized_flights, 'FlySample', 'Luca Siragusa', series_handler)
+            zip_file.write(file_path, arcname=Path(file_path).name)
+
+    zip_buffer.seek(0)
+    return zip_buffer
+
 def test_comparative(): 
     # Get the SSIM file path from the command line argument
     base_ssim_relative_path = sys.argv[1]
@@ -138,7 +183,7 @@ def test_comparative():
 if __name__ == '__main__':
     start_time = time.time()  # Record the start time
 
-    test_comparative()
+    test_batch()
 
     end_time = time.time()  # Record the end time
     duration = end_time - start_time  # Calculate the duration

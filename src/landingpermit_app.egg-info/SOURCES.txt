@@ -5,7 +5,11 @@ data/ssim/20180911 EY SSIM 2019 Cargo Budget 75P.ssim
 data/ssim/2019_2023_Cargo_5YP_50TH_05Nov18.ssim
 data/ssim/2020_Passenger_Budget.ssim
 data/ssim/EY_SSIM.ssim
-data/ssim/EY_SSIM_2.ssim
+data/ssim/EY_SSIM_alt_compare.ssim
+data/ssim/EY_SSIM_base_compare.ssim
+data/ssim/EY_SSIM_small_alt.ssim
+data/ssim/EY_SSIM_small_base.ssim
+data/ssim/EY_SSIM_tiny.ssim
 src/landingpermit_app.egg-info/PKG-INFO
 src/landingpermit_app.egg-info/SOURCES.txt
 src/landingpermit_app.egg-info/dependency_links.txt
@@ -14,11 +18,12 @@ src/landingpermit_app.egg-info/top_level.txt
 src/lib/__init__.py
 src/lib/comparer.py
 src/lib/permit_generator.py
+src/lib/serialize_flights.py
 src/models/__init__.py
 src/models/airport.py
-src/models/airport_data_loader.py
 src/models/country.py
 src/models/country_handler.py
+src/models/de_serialize.py
 src/models/flight.py
 src/models/flight_handler.py
 src/models/flight_series.py
@@ -29,3 +34,5 @@ src/models/ssim_file.py
 src/models/ssim_file_reader.py
 src/utils/__init__.py
 src/utils/file_helper.py
+src/utils/pendulum_helper.py
+tests/test_flight_serialization.py
