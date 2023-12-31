@@ -5,7 +5,7 @@ from datetime import datetime, date
 # define global variables
 today = datetime.now()
 start_of_year = date(today.year, 1, 1)
-end_of_year = date(today.year, 12, 31)
+end_of_year = date(today.year+1, 12, 31)
 
 # Set page to wide mode
 st.set_page_config(layout="wide")
