@@ -5,7 +5,8 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 import pendulum
-from models.flight import Flight
+
+from src.models.flight import Flight
 
 # Calculate the path to the 'src' directory
 root_dir = Path(__file__).resolve().parent.parent
