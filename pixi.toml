@@ -1,0 +1,22 @@
+[project]
+name = "landingpermit_app"
+version = "0.1.0"
+description = "Add a short description here"
+authors = ["Luca"]
+channels = ["conda-forge"]
+platforms = ["linux-64"]
+
+[tasks]
+
+[dependencies]
+numpy = "1.26.2.*"
+pandas = "2.1.4.*"
+pendulum = "2.1.2.*"
+python-dateutil = "2.8.2.*"
+pytz = "2023.3.post1.*"
+pytzdata = "2020.1.*"
+six = "1.16.0.*"
+tzdata = "2023d.*"
+streamlit = "1.29.0.*"
+python = "3.12.1.*"
+pytest = "7.4.4.*"
