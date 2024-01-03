@@ -1,6 +1,7 @@
-import streamlit as st
+from datetime import date, datetime
+
 import pandas as pd
-from datetime import datetime, date
+import streamlit as st
 
 # define global variables
 today = datetime.now()

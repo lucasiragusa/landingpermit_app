@@ -10,3 +10,4 @@ data/.DS_Store
 src/.DS_Store
 .vscode/
 landingpermit_app.egg-info/
+.DS_Store
