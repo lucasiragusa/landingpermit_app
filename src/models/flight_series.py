@@ -1,12 +1,7 @@
-import sys
-from pathlib import Path
+
 import pendulum
-
-sys.path.append(str(Path(__file__).resolve().parent.parent))
-
-from models.airport import airport_data
 from models.airport import Airport
-from utils.pendulum_helper import reformat_date_signature, parse_date
+from utils.pendulum_helper import parse_date, reformat_date_signature
 
 
 class FlightSeries: 

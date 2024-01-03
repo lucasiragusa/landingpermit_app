@@ -1,13 +1,14 @@
-import sys
-from pathlib import Path
 
-sys.path.append(str(Path(__file__).resolve().parent.parent))
-
-from models.flight_series_handler import FlightSeriesHandler
-from models.airport import airport_data
-from models.ssim_file import SSIM_File
 from models.flight import Flight
-from utils.pendulum_helper import get_date_range, pendulum_to_string, parse_date, reformat_date_signature, get_weekday
+from models.flight_series_handler import FlightSeriesHandler
+from models.ssim_file import SSIM_File
+from utils.pendulum_helper import (
+        get_date_range,
+        get_weekday,
+        parse_date,
+        pendulum_to_string,
+        reformat_date_signature,
+)
 
 
 def de_serialize(ssim_path):

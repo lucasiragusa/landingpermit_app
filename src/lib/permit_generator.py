@@ -1,19 +1,8 @@
-import sys
 import os
+
 import pandas as pd
-from pathlib import Path
-
-# TODO: install lib as package instead
-# This will get the path to the parent directory of the current directory (i.e., landingpermit_app)
-sys.path.append(str(Path(__file__).resolve().parent.parent))
-
-from models import flight_series_handler, airport, flight_series, ssim_file
-from models import flight_series_handler, airport, flight_series, ssim_file
-from utils.pendulum_helper import parse_date, pendulum_to_string
-
-
 from docx import Document
-from docx.shared import Inches
+from utils.pendulum_helper import parse_date, pendulum_to_string
 
 
 def generate_document_from_ssim(country, ssim_file, airline_name, contact_person, handler): # TODO: add type hints?
