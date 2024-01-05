@@ -20,15 +20,31 @@ import time
 import sys
 import os
 import pandas as pd
-import pendulum
 import zipfile
 import io
 
-def test_batch(): 
-         
-    # Get the SSIM file path from the command line argument
-    ssim_relative_path = sys.argv[1]
+import cProfile
+from functools import wraps
+from pstats import Stats, SortKey
+from time import time
 
+def profile(f):
+    """A simple timer decorator"""
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        with cProfile.Profile() as pr:
+            result = f(*args, **kwargs)
+        ps = Stats(pr)
+        print("Most time spent in general:")
+        ps.sort_stats(SortKey.CUMULATIVE).print_stats(10)
+        print("Functions taking most time:")
+        ps.sort_stats(SortKey.TIME).print_stats(10)
+        return result
+    return wrapper
+
+@profile
+def compute_batch(ssim_relative_path): 
+         
     # Resolve Path and create SSIM_File object
     ssim_path = Path(ssim_relative_path)
     ssim_absolute_path = ssim_path.resolve()
@@ -181,9 +197,13 @@ def test_comparative():
 
 
 if __name__ == '__main__':
+
+    # Get the SSIM file path from the command line argument
+    ssim_relative_path = sys.argv[1]
+
     start_time = time.time()  # Record the start time
 
-    test_batch()
+    compute_batch(ssim_relative_path=ssim_relative_path)
 
     end_time = time.time()  # Record the end time
     duration = end_time - start_time  # Calculate the duration
