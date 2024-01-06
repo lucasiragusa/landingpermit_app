@@ -8,7 +8,6 @@ import pendulum
 
 from src.models.airport import Airport, airport_data
 
-
 class Flight:
     """
     Represents a single flight. This class has similar attributes to the FlightSeries class,

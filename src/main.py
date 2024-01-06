@@ -16,7 +16,6 @@ import pendulum
 
 # TODO: install as package instead
 from pathlib import Path
-sys.path.append(str(Path(__file__).parent.resolve()))
 
 
 def test_batch(): 
