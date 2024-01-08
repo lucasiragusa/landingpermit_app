@@ -32,7 +32,6 @@ class DateSeasonHandler:
         seasons = []
         
         # Identify the season of the start and end dates
-        print (self.start_date)
         start_season = self.determine_season(self.start_date)
         end_season = self.determine_season(self.end_date)
 

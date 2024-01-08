@@ -1,11 +1,15 @@
-import streamlit as st
+from datetime import date, datetime
+
 import pandas as pd
-from datetime import datetime, date
+import streamlit as st
 
 # define global variables
 today = datetime.now()
 start_of_year = date(today.year, 1, 1)
 end_of_year = date(today.year, 12, 31)
+
+# Set page to wide mode
+st.set_page_config(layout="wide")
 
 # Function to create the layout for Batch Doc generation page
 def batch_doc_generation_page(title):
@@ -18,7 +22,7 @@ def batch_doc_generation_page(title):
         [today.date(), (today + pd.DateOffset(days=7)).date()],
         min_value=start_of_year,
         max_value=end_of_year,
-        format="DD/MM/YYYY"
+        format="DD-MM-YYYY"
     )
 
     # date_range will be a list of 0, 1, or 2 date objects
@@ -52,7 +56,7 @@ elif app_mode == "Comparative Doc Generation":
         [today.date(), (today + pd.DateOffset(days=7)).date()],
         min_value=start_of_year,
         max_value=end_of_year,
-        format="DD/MM/YYYY",
+        format="DD-MM-YYYY",
         key="comparative_date_range"  # unique key for this date input
     )
 
@@ -66,4 +70,3 @@ elif app_mode == "Comparative Doc Generation":
     with col2:
         st.subheader("Insert new SSIM File")
         new_ssim_file = st.file_uploader("Drag and drop file here or click to browse", type="txt", key="new_ssim")
-

@@ -1,7 +1,39 @@
-from models.airport import airport_data
+
+import pendulum
 from models.airport import Airport
+from utils.pendulum_helper import parse_date, reformat_date_signature
+
 
 class FlightSeries: 
+
+    """
+    Represents a series of flights, all of which share the same details. 
+    It is a customary representation of scheduled flights in the airline industry. 
+    Many instances of "Flight" objectes can be grouped as a flight series object so far 
+    as they share the same attributes other than departure date. 
+
+    Attributes:
+        airline_designator (str): The IATA Designator of the Operating Airline.
+        flight_number (str): The flight number. 
+        service_type (str): SSIM-compliant Service type indicating the type of flight (e.g. scheduled pax, cargo, etc.)
+        effective_date (str): The starting date from which the flight series is effective, in DDMMMYY format.
+        discontinued_date (str): The date after which the flight series is no longer operational, in DDMMMYY format.
+        days_of_operation (str): Days of the week on which the flight operates.(Monday = 1)
+        departure_station (Airport): The airport from which the flight departs.
+        departure_time (str): The scheduled departure time of the flight.
+        arrival_station (Airport): The airport at which the flight arrives.
+        arrival_time (str): The scheduled arrival time of the flight.
+        equipment (str): Details about the flight's equipment.
+        aircraft_configuration (str): Configuration of the aircraft used in the flight.
+
+    Methods:
+        __init__(flight_series_data): Constructs the FlightSeries object with provided flight series data.
+        __repr__(): Returns a string representation of the FlightSeries object.
+        to_dict(): Converts the FlightSeries object to a dictionary representation.
+
+    The FlightSeries is initialized with a dictionary containing the flight series data.
+    Each attribute of the class represents a key aspect of the flight series information.
+    """
 
     def __init__(self, flight_series_data):
         
@@ -17,10 +49,35 @@ class FlightSeries:
         self.arrival_time = flight_series_data['Arvl time (pax)']
         self.equipment = flight_series_data['Equipment']
         self.aircraft_configuration = flight_series_data['Aircraft configuration']
-        #Add number of Flights
+        
+        # Determine how many flights are in the flight series
+        self.no_of_flights = 0
+        
+        eff_date = reformat_date_signature(self.effective_date)
+        dis_date = reformat_date_signature(self.discontinued_date)
+        
+        # print ('Debug eff date format is', eff_date)
+        # print ('Debug dis date format is', dis_date)
+        
+        for date in pendulum.interval(parse_date(eff_date), parse_date(dis_date)).range('days'):
+            if str(date.isoweekday()) in self.days_of_operation:
+                self.no_of_flights += 1
+
+        #Add time mode (local/UTC) in arguments to constructor
+        #Add IATA Season
 
     def __repr__(self):
-        return f"{self.airline_designator} {self.flight_number}: {self.departure_station}-{self.arrival_station} ({self.effective_date}-{self.discontinued_date})"
+        
+        self.days_of_operation = self.days_of_operation.replace(' ', '')
+        temp_string = ''
+        for i in range (1,8): 
+            if str(i) in self.days_of_operation:
+                temp_string += str(i)
+            else: 
+                temp_string += '.'
+        self.days_of_operation = temp_string
+        
+        return f"{self.airline_designator} {self.flight_number}: {self.departure_station}-{self.arrival_station} ({self.effective_date}-{self.discontinued_date}) {self.days_of_operation}"
     
     def to_dict(self):
         return {
@@ -37,3 +94,6 @@ class FlightSeries:
             'Equipment': self.equipment,
             'Aircraft configuration': self.aircraft_configuration
         }
+        
+    def __str__(self):
+        return f'{self.airline_designator} {self.flight_number} {self.departure_station}-{self.arrival_station} Date interval:{self.effective_date}-{self.discontinued_date} Days of ops: {self.days_of_operation}'

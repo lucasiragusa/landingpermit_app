@@ -1,6 +1,15 @@
-from models.flight_series import FlightSeries
-from models.airport import Airport
+
+
+import pendulum
 from models.airport import airport_data
+from models.flight import Flight
+from models.flight_series import FlightSeries
+from utils.pendulum_helper import (
+    parse_date,
+    pendulum_to_string,
+    reformat_date_signature,
+)
+
 
 class FlightSeriesHandler:
     def __init__(self):
@@ -15,7 +24,7 @@ class FlightSeriesHandler:
         return self.flight_series_collection
 
 
-    def get_unique_countries(self):
+    def get_unique_countries(self, flight_series_collection):
         """Return a set of all unique countries from the flight series."""
 
         # Using a helper function to determine the country of an airport.
@@ -25,7 +34,7 @@ class FlightSeriesHandler:
             
         countries = set()
 
-        for series in self.flight_series_collection:
+        for series in flight_series_collection:
             departure_country = get_country(series.departure_station.iata_code)
             arrival_country = get_country(series.arrival_station.iata_code)
 
@@ -37,7 +46,6 @@ class FlightSeriesHandler:
         countries.discard(None)
         
         return countries
-
 
     def add_flight_series(self, flight_series_data):
         flight_series = FlightSeries(flight_series_data)
@@ -72,4 +80,51 @@ class FlightSeriesHandler:
 
         return filtered_series
 
+    def parse_date(date_str):
+        """
+        Parses a date string in a specific format to a datetime object.
 
+        Args:
+            date_str (str): Date string in '01May23' format.
+
+        Returns:
+            datetime.date: Parsed date.
+        """
+        return pendulum.from_format(date_str, 'DDMMMYY')
+
+    def de_serialize_flight_series(self, flight_series_collection):
+        
+        '''
+        Converts a collection of FlightSeries objects to a list of flight objects.   
+        '''
+        
+        flight_collection = [] #Declare the output flight collection
+        
+        if len(flight_series_collection) == 0:
+            raise ValueError('No flight series in collection.')
+        
+        for series in flight_series_collection:
+            eff_date = reformat_date_signature(series.effective_date)
+            dis_date = reformat_date_signature(series.discontinued_date)
+
+            # Iterate over all dates in the flight series
+            for date in pendulum.interval(parse_date(eff_date), parse_date(dis_date)).range('days'):
+                # Check if the flight operates on the current date
+                if str(date.isoweekday()) in series.days_of_operation:
+                    # Create a flight object
+                    flight_data = {
+                        'Airline designator': series.airline_designator,
+                        'Flight number': series.flight_number,
+                        'Service Type': series.service_type,
+                        'Departure Date': pendulum_to_string(date),
+                        'Dept Stn': series.departure_station.iata_code,
+                        'Dept time (pax)': series.departure_time,
+                        'Arvl Stn': series.arrival_station.iata_code,
+                        'Arvl time (pax)': series.arrival_time,
+                        'Equipment': series.equipment,
+                        'Aircraft configuration': series.aircraft_configuration
+                    }
+                    flight = Flight(flight_data)
+                    flight_collection.append(flight)
+        return flight_collection
+    
