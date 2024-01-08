@@ -1,5 +1,6 @@
 # Git Ignore
 venv/
+landingpermit_app_venv/
 data/generated_docs/
 landing_env/
 src/permits_output

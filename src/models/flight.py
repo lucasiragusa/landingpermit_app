@@ -6,7 +6,7 @@
 
 import pendulum
 
-from src.models.airport import Airport, airport_data
+from models.airport import Airport, airport_data
 
 class Flight:
     """
