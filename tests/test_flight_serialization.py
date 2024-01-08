@@ -1,19 +1,19 @@
-from pathlib import Path
-import time
 import random
-import pendulum
 import sys
+import time
 from datetime import datetime, timedelta
+from pathlib import Path
+
+import pendulum
+
+from src.models.flight import Flight
 
 # Calculate the path to the 'src' directory
 root_dir = Path(__file__).resolve().parent.parent
 src_dir = root_dir / 'src'
 
-# Add 'src' directory to sys.path
-sys.path.append(str(src_dir))
 
-from models.flight import Flight
-from models.flight_series import FlightSeries
+
 
 def parse_date(date_str):
     """

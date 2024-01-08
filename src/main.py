@@ -16,19 +16,18 @@ import pendulum
 
 # TODO: install as package instead
 from pathlib import Path
-sys.path.append(str(Path(__file__).parent.resolve()))
 
 
 def test_batch(): 
          
     # Get the SSIM file path from the command line argument
     ssim_relative_path = sys.argv[1]
-
+    
     # Resolve Path and create SSIM_File object
     ssim_path = Path(ssim_relative_path)
     ssim_absolute_path = ssim_path.resolve()
     ssim_object = SSIM_File(str(ssim_absolute_path))
-
+    
     # Declare handlers
     series_handler = FlightSeriesHandler()
     flight_handler = FlightHandler()
@@ -138,7 +137,8 @@ def test_comparative():
 if __name__ == '__main__':
     start_time = time.time()  # Record the start time
 
-    test_comparative()
+    # test_comparative()
+    test_batch()
 
     end_time = time.time()  # Record the end time
     duration = end_time - start_time  # Calculate the duration

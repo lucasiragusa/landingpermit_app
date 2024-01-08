@@ -1,16 +1,14 @@
 
-import sys
-from pathlib import Path
 
-sys.path.append(str(Path(__file__).resolve().parent.parent))
-
-from models.flight_series import FlightSeries
-from models.airport import Airport
+import pendulum
 from models.airport import airport_data
 from models.flight import Flight
-from models.ssim_file import SSIM_File
-from utils.pendulum_helper import pendulum_to_string, reformat_date_signature, parse_date
-import pendulum
+from models.flight_series import FlightSeries
+from utils.pendulum_helper import (
+    parse_date,
+    pendulum_to_string,
+    reformat_date_signature,
+)
 
 
 class FlightSeriesHandler:

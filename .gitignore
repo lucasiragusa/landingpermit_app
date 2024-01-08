@@ -1,8 +1,7 @@
 # Git Ignore
 venv/
+landingpermit_app_venv/
 data/generated_docs/
-*.pyc
-__pycache__/
 landing_env/
 src/permits_output
 src/tree.py
@@ -11,3 +10,18 @@ src/.DS_Store
 .vscode/
 landingpermit_app.egg-info/
 .DS_Store
+.pixi
+
+# Python
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+*.pyi
+*.pyc
+*.pyo
+*.pyd
+*.pyi
+*.egg-info/
+dist/
+build/

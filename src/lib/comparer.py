@@ -1,17 +1,11 @@
 # TODO: what shall this be about?
 
-from pathlib import Path
-import pendulum
-import pandas as pd
-import sys
-from pathlib import Path
 from copy import deepcopy
+from pathlib import Path
+
+from models.de_serialize import de_serialize
 
 # Add the project directory to Python's module search path
-sys.path.append(str(Path(__file__).resolve().parent.parent))
-from models.flight import Flight
-from models.airport import Airport
-from models.de_serialize import de_serialize
 
 
 def compare_flights(base_flights, alt_flights):
@@ -89,8 +83,9 @@ def get_countries_with_changes(modified_flights):
 
 if __name__ == '__main__':
     
-    import time 
     import json
+    import time
+
     from models.ssim_file import SSIM_File
     
     start_time = time.time()  # Start timing

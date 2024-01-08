@@ -4,9 +4,9 @@
 # But fundamentally it is made up by individual flights, this class is supposed to represent individual flights 
 # It will be useful in the part where we compare the base ssim with the alt ssim and output only the flights that changed
 
-from models.airport import airport_data, Airport
 import pendulum
 
+from models.airport import Airport, airport_data
 
 class Flight:
     """
